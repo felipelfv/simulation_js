@@ -72,7 +72,7 @@ mask: false
 
 bibliography: "references.bib"
 nocite: |
-  @rosseel_2012, @lavaan_estimator_iv, @lavaan_estimator_js, @lavaan_estimators
+  @rosseel_2012, @lavaan_estimator_iv, @lavaan_estimators
 meta-analysis: false
 
 format:
@@ -268,8 +268,8 @@ $$ {#eq-miiv-estimator}
 
 The James–Stein approach replaces the latent predictors in each equation by
 estimates of their conditional expectations given observed proxies, followed
-by least squares. The least-squares step requires the error of each equation
-to be uncorrelated with its latent predictors and with the measurement
+by least squares [@burghgraeve_etall_2021]. The least-squares step requires
+the error of each equation to be uncorrelated with its latent predictors and with the measurement
 errors of the proxies. In the scaling version, the proxies are the marker
 indicators.
 
@@ -322,11 +322,11 @@ $$
 $$ {#eq-reliability}
 
 Without normality, the same expression gives the best linear predictor under
-the stated covariance assumptions. The reliability adjustment $\mathbf{R}_j$
+the stated covariance assumptions [@burghgraeve_etall_2021]. The reliability adjustment $\mathbf{R}_j$
 is not a covariance matrix and need not be symmetric.
 
 Preliminary measurement-error variances are obtained using a Spearman-type
-procedure. Incorporating the small-sample correction gives
+procedure [@burghgraeve_etall_2021; @lavaan_estimator_js]. Incorporating the small-sample correction gives
 
 $$
 \widehat{\mathbf{R}}_j
@@ -587,8 +587,8 @@ $$
 $$ {#eq-wls-v}
 assuming that $\widehat{\mathbf{G}}$ has full column rank.
 
-Reweighted least squares updates the weights using the current implied
-covariance matrix:
+Reweighted least squares updates the normal-theory weight matrix
+[@browne_1974] using the current implied covariance matrix:
 
 $$
 \widehat{\mathbf{W}}^{(r)}
@@ -645,13 +645,9 @@ $$ {#eq-mean-estimates}
 
 These expressions preserve the fixed zero marker intercepts and reproduce
 the observed sample means. Additional mean-structure restrictions require a
-corresponding constrained estimation step.
-
-Together, these stages estimate the free entries of
-$\boldsymbol{\Lambda}$, $\mathbf{B}$, $\boldsymbol{\Theta}$,
-$\boldsymbol{\Psi}$, $\boldsymbol{\nu}$, and $\boldsymbol{\alpha}$. Holding
-coefficient estimates fixed when calculating subsequent point estimates does
-not imply treating them as known when calculating standard errors.
+corresponding constrained estimation step. Together, these stages estimate the 
+free entries of $\boldsymbol{\Lambda}$, $\mathbf{B}$, $\boldsymbol{\Theta}$,
+$\boldsymbol{\Psi}$, $\boldsymbol{\nu}$, and $\boldsymbol{\alpha}$. 
 
 # Analytical Standard Errors
 
@@ -736,7 +732,7 @@ final variance, covariance, and intercept estimates on the estimated
 directed coefficients.
 
 The matrix $\boldsymbol{\Gamma}$ may be estimated under multivariate
-normality or using empirical moments through order four. For parameter
+normality or using empirical moments through order four [@browne_1984]. For parameter
 $r=1,\ldots,d$, the analytical standard error is
 
 $$
