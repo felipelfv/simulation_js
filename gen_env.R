@@ -26,12 +26,3 @@ rix(date = "2026-05-11", # available_dates(); 1.8.x quarto (1.9.37 has a pandoc 
     project_path = ".",
     overwrite = TRUE
 )
-
-# rix bug workaround (per the official docs: "manually inspect and fix the file")
-# https://docs.ropensci.org/rix/articles/remote-dependencies.html
-# lavaan's DESCRIPTION has `Depends: R (>= ...)`, which rix mis-parses as an
-# R-package dependency. R lives at pkgs.R, not pkgs.rPackages.R
-# current solution: strip the bad line so the nix build succeeds
-nix <- readLines("default.nix")
-nix <- nix[!grepl("^\\s+R\\s*$", nix)]
-writeLines(nix, "default.nix")
