@@ -49,7 +49,8 @@ author-note:
     to declare. Generative AI (Claude Opus 5.5, Anthropic) was used to create
     all figures, with the TikZ and R code based on earlier files written by the
     first author, and to improve the flow of the Introduction and Discussion. 
-    All AI output and suggestions were checked by the first author."
+    All AI output and suggestions were checked by the first author, and the
+    authors take full responsibility for the content of this article."
     financial-support: "This project was funded by the Special Research Fund
     (BOF) of Ghent University (BOF/24J/2023/144)."
     gratitude: ~
@@ -170,9 +171,9 @@ used bootstrap standard errors for both JS and JSA in their empirical
 evaluations. 
 The R package lavaan [@rosseel_2012] now provides analytical standard errors for 
 both estimators by applying the delta method to the complete estimation 
-procedure. Initially restricted to confirmatory factor models, its JS and JSA 
-implementations now also support more extensive models, and the package includes 
-MIIV estimation.
+procedure. In addition, its JS and JSA implementations, initially restricted
+to confirmatory factor models, have been extended to more general models, and
+the package also includes MIIV estimation.
 
 ## Present Study and Contributions
 
@@ -385,8 +386,8 @@ The James–Stein approach replaces the latent predictors in each equation by
 estimates of their conditional expectations given observed proxies, followed
 by least squares [@burghgraeve_etall_2021]. The implementation considered
 here is restricted to recursive latent variable models without higher order
-factors. Let $\mathcal{P}_j$ index the
-$k_j$ latent predictors of equation $j$. The proxies are indicators that load
+factors. For the same equation $j$, let $\mathcal{P}_j$ index its $k_j$ latent
+predictors. The proxies are indicators that load
 only on the corresponding latent predictor, with measurement errors
 $\boldsymbol{\epsilon}^{(p)}_{j}$ such that
 $\operatorname{Var}(\boldsymbol{\epsilon}^{(p)}_{j})$ is diagonal and
@@ -1315,6 +1316,8 @@ The simulation was intended as a focused evaluation rather than an exhaustive
 comparison. Further research should compare MIIV, JS, and JSA across a broader
 range of conditions, including departures from normality and misspecification
 of the measurement and latent variable models.
+
+\newpage{}
 
 # References
 
