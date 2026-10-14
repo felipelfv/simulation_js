@@ -18,6 +18,11 @@ author:
     roles:
       - Conceptualization
       - Methodology
+      - Software
+      - Investigation
+      - Data curation
+      - Formal analysis
+      - Visualization
       - Writing - original draft
       - Writing - review & editing
   - name: Yves Rosseel
@@ -47,20 +52,19 @@ author-note:
     gratitude: ~
 
 abstract: |
-  This article sets out the notation of a linear structural equation model with
-  a mean structure and describes model-implied instrumental-variable
-  two-stage least squares (MIIV-2SLS) and the scaling and aggregated
-  James–Stein estimators as implemented in lavaan. Both obtain factor
-  loadings and latent regression slopes equation by equation without
-  iterative optimization. The remaining variance and covariance parameters
-  are subsequently estimated by reweighted least squares. For both
-  procedures we state the estimators of the factor loadings and latent
-  regression slopes, the subsequent estimation of the variance, covariance,
-  and mean structure parameters, and the default covariance estimators of
-  the factor loadings and latent regression slopes. For the
-  James–Stein estimators we write the complete estimation procedure as a map
-  from the sample moments to the parameter estimates and give the resulting
-  delta method standard errors.
+  This article presents model-implied instrumental-variable two-stage least
+  squares (MIIV-2SLS) and scaling and aggregated James–Stein estimation
+  within a common notation, following their implementation in the R package
+  lavaan. We describe the estimation of factor loadings and latent regression
+  slopes equation by equation, followed by the estimation of variance,
+  covariance, and intercept parameters. We provide analytical standard errors
+  for both James–Stein estimators using the delta method, accounting for
+  uncertainty across all estimation stages, and describe the default MIIV
+  standard errors. A simulation study compares the standard error accuracy
+  of these approaches with maximum likelihood under correct model
+  specification. The standard errors of the MIIV and James–Stein estimators
+  perform comparably to those of maximum likelihood under the conditions
+  examined. 
 
 keywords: [structural equation modeling, model-implied instrumental variables, James–Stein estimation, two-stage least squares, delta method]
 
@@ -104,9 +108,10 @@ execute:
 ---
 
 Structural equation models (SEMs) with latent variables are usually estimated
-by maximum likelihood (ML), which estimates all parameters jointly. Despite
-its desirable properties when its assumptions hold, ML has limitations that
-can arise in practice. For instance, a misspecification in one equation can
+by maximum likelihood (ML), which estimates all parameters jointly. Although
+ML has desirable asymptotic properties when its assumptions hold,
+difficulties can arise when it is applied in practice. For instance, a 
+misspecification in one equation can
 bias estimates in other equations [@kaplan_1988; @bollen_etall_2007;
 @bollen_2018; @dhaene_rosseel_2023; see also @jin_etall_2021, for diagonally
 weighted least squares], and the iterative optimization can fail to converge
@@ -640,10 +645,12 @@ $\widetilde{\mathbf{X}}_{A,j}$ are assumed to have full column rank.
 
 # Estimation of Variance, Covariance, and Intercept Parameters
 
-For each of the three estimators of the factor loadings and latent
-regression slopes, the remaining variance and covariance parameters are
-estimated by reweighted least squares [@maydeuolivares_etall_2026], holding
-these estimates fixed throughout the iterations. Let
+After estimating the factor loadings and latent regression slopes, the
+remaining variance and covariance parameters can be estimated using several
+least squares procedures [@maydeuolivares_etall_2026]. For all three
+estimators, we use reweighted least squares, the default in the
+implementations considered, holding the estimated loadings and slopes fixed
+throughout the iterations. Let
 
 $$
 \widehat{\mathbf{H}}

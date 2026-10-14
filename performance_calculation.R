@@ -17,7 +17,7 @@ ns <- sort(unique(res$n)); rels <- sort(unique(res$rel))
 est <- c("JS", "JSA", "IV", "ML")
 R <- max(res$replication); n_cond <- length(ns) * length(rels)
 
-## screening: convergence, outliers, inadmissible solutions ------------------------
+## screening: convergence, outliers, inadmissible solutions
 res$cond <- paste(res$n, res$rel)
 key <- function(d) paste(d$cond, d$replication)
 nonfinite <- !is.finite(res$estimate) | !is.finite(res$se) |
@@ -48,7 +48,7 @@ scr <- list(
   inad_by = table(inad$estimator, inad$cond),
   inadmissible_replications = inad)
 
-## performance measures on the retained replications ------------------------------------
+## performance measures on the retained replications
 summ <- do.call(rbind, lapply(split(res_s, res_s[c("n", "rel", "estimator", "parameter")]),
   function(x) {
     tp <- x$true[1]
@@ -67,6 +67,6 @@ summ <- do.call(rbind, lapply(split(res_s, res_s[c("n", "rel", "estimator", "par
   }))
 rownames(summ) <- NULL
 
-## save -----------------------------------------------------------------------------------
+## save
 saveRDS(summ, "results/performance.rds")
 saveRDS(scr, "results/screening.rds")
