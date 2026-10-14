@@ -63,7 +63,8 @@ data set with the four estimators (`lavaan::sem` with `estimator = "JS"`,
 `"JSA"`, `"IV"`, and `"ML"`, all with a mean structure). It stores the
 estimates, standard errors, and confidence intervals of every free parameter
 other than the intercepts. One seed (`1234`) is set before the loop. The run
-takes about 45 minutes on a laptop.
+takes about 45 minutes on an Apple M4 Pro with 24 GB of memory running macOS
+Sequoia 15.7.3.
 
 ### Step 2: Screen the replications and compute the performance measures
 
