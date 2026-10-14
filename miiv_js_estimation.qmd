@@ -121,7 +121,8 @@ or end in inadmissible solutions, especially in small samples [@bollen_2018;
 factor loadings and latent regression slopes are estimated one equation at a
 time and in closed form, which may limit the propagation of misspecification
 across equations [@bollen_gates_fisher_2018; @burghgraeve_etall_2021] and
-avoids iterative optimization for this part of the estimation. Two such estimators are considered. Model-implied
+avoids iterative optimization for this part of the estimation. Two such 
+estimators are considered. Model-implied
 instrumental-variable (MIIV) estimation replaces each latent variable by a
 scaling indicator and uses instruments implied by the model to correct for the
 resulting measurement error [@bollen_1996; @bollen_bauer_2004; @bollen_2018].
@@ -151,8 +152,8 @@ parameters were derived under unweighted least squares by
 @bollen_maydeuolivares_2007 and extended to general weight matrices by
 @jin_etall_2021. More recently, @maydeuolivares_etall_2026 compared subsequent
 variance and covariance estimation procedures and the accuracy of their
-standard errors. For James–Stein estimation, @burghgraeve_etall_2021 derived a sampling
-variance expression for latent regression estimates that accounts for
+standard errors. For James–Stein estimation, @burghgraeve_etall_2021 derived a 
+sampling variance expression for latent regression estimates that accounts for
 uncertainty in the estimated reliability adjustment, providing a basis for
 analytical standard errors for those estimates. However, they did not develop
 a complete analytical standard error calculation for all model parameters and
@@ -162,7 +163,7 @@ The R package lavaan [@rosseel_2012] now provides analytical standard errors for
 both estimators by applying the delta method to the complete estimation 
 procedure. Initially restricted to confirmatory factor models, its JS and JSA 
 implementations now also support more extensive models, and the package includes 
-MIIV estimation (see the lavaan help pages estimator_iv and estimator_js).
+MIIV estimation.
 
 ## Present Study and Contributions
 
@@ -887,14 +888,10 @@ $$
 \in\mathbb{R}^{d\times h}.
 $$
 
-The Jacobian is evaluated analytically by default by differentiating the
-estimation steps. For reweighted least squares, the derivative is obtained by implicit
-differentiation of the converged estimating equations. The Jacobian
-propagates uncertainty through the preliminary error variance estimates,
-reliability adjustments, estimates of the factor loadings and latent
-regression slopes, variance and covariance estimates, and intercept
-estimates. For JSA, it also accounts for the estimated aggregation
-weights and normalization loadings.
+The Jacobian is evaluated analytically by default, including implicit
+differentiation of the converged reweighted least squares equations. For JSA,
+it also incorporates derivatives of the estimated aggregation weights and
+normalization loadings.
 
 The matrix $\boldsymbol{\Gamma}$ can be estimated using normal theory or
 empirical moments through order four [@browne_1984]. Normal theory
@@ -1044,18 +1041,24 @@ of the SE$^2$/VAR ratio are obtained by jackknife and that of coverage in
 closed form. The SE/SD ratio and the SE$^2$/VAR ratio compare the same
 quantities on the standard deviation and on the variance scale, so only
 the latter, for which an MCSE is available, is shown in the figures.
+Although the evaluation targets the standard errors, the relative bias of
+the estimates was also computed, because standard errors of markedly
+biased estimates are of limited use for inference. It is reported in the
+text but not in the figures.
 
 ```{r}
 #| label: tbl-performance
 #| tbl-cap: "Performance Measures for Evaluating the Standard Errors"
 #| apa-note: "$\\hat\\theta_k$ is the estimate of parameter $\\theta$ in replication $k$ ($k = 1, \\dots, K$) and $\\bar{\\theta}$ the mean of the $K$ estimates. $\\widehat{SE}_k$ is the estimated standard error in replication $k$, $\\overline{SE} = \\tfrac{1}{K}\\sum_k \\widehat{SE}_k$, $\\overline{SE^2} = \\tfrac{1}{K}\\sum_k \\widehat{SE}_k^2$, and $L_k, U_k$ are the confidence interval limits. The subscript $(j)$ marks a leave-one-out jackknife replicate. The dash marks an MCSE that is not computed."
 tab <- data.frame(
-  measure = c("SD", "SE/SD ratio", "SE$^2$/VAR ratio", "Coverage"),
-  empirical = c("$S_{\\hat\\theta}=\\sqrt{\\tfrac{1}{K-1}\\sum_{k=1}^{K}(\\hat\\theta_k-\\bar{\\theta})^2}$",
+  measure = c("Relative bias", "SD", "SE/SD ratio", "SE$^2$/VAR ratio", "Coverage"),
+  empirical = c("$(\\bar{\\theta}-\\theta)/\\theta$",
+                "$S_{\\hat\\theta}=\\sqrt{\\tfrac{1}{K-1}\\sum_{k=1}^{K}(\\hat\\theta_k-\\bar{\\theta})^2}$",
                 "$\\overline{SE}/S_{\\hat\\theta}$",
                 "$\\nu=\\overline{SE^2}/S_{\\hat\\theta}^2$",
                 "$c=\\tfrac{1}{K}\\sum_{k=1}^{K}I(L_k\\le\\theta\\le U_k)$"),
-  mcse = c("$\\sqrt{\\tfrac{K-1}{K}\\sum_{j=1}^{K}(S_{(j)}-S_{\\hat\\theta})^2}$",
+  mcse = c("$S_{\\hat\\theta}/(\\sqrt{K}\\,|\\theta|)$",
+           "$\\sqrt{\\tfrac{K-1}{K}\\sum_{j=1}^{K}(S_{(j)}-S_{\\hat\\theta})^2}$",
            "---",
            "$\\sqrt{\\tfrac{K-1}{K}\\sum_{j=1}^{K}(\\nu_{(j)}-\\nu)^2}$",
            "$\\sqrt{c(1-c)/K}$"))
@@ -1082,6 +1085,12 @@ see the repository.
 #| label: performance
 source("performance_calculation.R")
 library(ggplot2)
+pct <- function(x) sprintf("%.1f", 100 * x)
+rb_other <- max(abs(summ$rel_bias[summ$estimator != "IV"]))
+rb_iv100 <- summ[summ$estimator == "IV" & summ$n == 100 & summ$rel == 0.6, ]
+rb_iv_load <- range(-rb_iv100$rel_bias[grepl("=~", rb_iv100$parameter)])
+rb_iv_var <- range(rb_iv100$rel_bias[grepl("^eta[0-9]~~", rb_iv100$parameter)])
+rb_300 <- max(abs(summ$rel_bias[summ$n >= 300]))
 summ$class <- ifelse(grepl("=~", summ$parameter), "Loadings",
                ifelse(grepl("~~", summ$parameter),
                       ifelse(grepl("^eta", summ$parameter), "Factor variances",
@@ -1176,6 +1185,16 @@ for JS at $n=100$ with reliability .6, where a disturbance variance
 estimate was negative. All of them were also flagged by the outlier
 screening, so none enters the results below.
 
+## Relative Bias
+
+JS, JSA, and ML were close to unbiased, with absolute relative bias of at
+most `r pct(rb_other)`% for any parameter and condition. MIIV was the
+exception at reliability .6 and small samples. At $n=100$ its loadings were
+underestimated by `r pct(rb_iv_load[1])` to `r pct(rb_iv_load[2])`% and its
+latent and disturbance variances overestimated by `r pct(rb_iv_var[1])` to
+`r pct(rb_iv_var[2])`%. From $n=300$ onward, all estimators were within
+`r pct(rb_300)`% of the population values.
+
 ## Standard Error Performance
 
 Each figure shows reliability .6 in the upper half and reliability .8 in
@@ -1208,10 +1227,9 @@ JSA, which pools all indicators of a latent variable, is unaffected.
 Second, the MIIV loadings undercover at reliability .6, with coverage of
 .88 to .90 at $n=100$ against .93 to .96 for the other estimators, while
 the MIIV SE$^2$/VAR ratio lies between 0.98 and 1.14 and its SD is the
-smallest. The gap comes from a downward bias of 0.06 to 0.08 in the
-MIIV loadings when the scaling indicators are unreliable, 
-a weak instrument effect also reported by @jin_etall_2021, and it fades 
-slowly with sample size.
+smallest. The gap reflects the downward bias of the MIIV loadings reported
+above, a weak instrument effect also reported by @jin_etall_2021, and it
+fades slowly with sample size.
 
 Third, the disturbance variances separate the estimators at $n=100$. ML
 undercovers them, at .91 to .94, although its SE$^2$/VAR ratio is close

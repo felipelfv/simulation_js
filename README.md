@@ -29,8 +29,9 @@ The manuscript, figures, and other non-code content are licensed under a
 ├── results/
 │   ├── replications.rds       # one row per replication × estimator × estimand (n, rel, replication,
 │   │                          #   estimator, parameter, true, estimate, se, ci_lower, ci_upper)
-│   ├── performance.rds        # one row per condition × estimator × estimand (K, bias, sd, sd_mcse,
-│   │                          #   se_sd, rb_var, rb_var_mcse, coverage, coverage_mcse)
+│   ├── performance.rds        # one row per condition × estimator × estimand (K, bias, rel_bias,
+│   │                          #   rel_bias_mcse, sd, sd_mcse, se_sd, rb_var, rb_var_mcse,
+│   │                          #   coverage, coverage_mcse)
 │   └── screening.rds          # convergence, outlier, and inadmissibility counts
 ├── miiv_js_estimation.qmd     # paper source (APA 7 via the apaquarto extension)
 ├── references.bib             # bibliography

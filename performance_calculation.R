@@ -3,7 +3,8 @@
 ## Input:  results/replications.rds (written by simulation.R, which is run
 ##         first if the file is missing)
 ## Output: results/performance.rds, one row per condition, estimator, and
-##         estimand (K, bias, sd, sd_mcse, se_sd, rb_var, rb_var_mcse,
+##         estimand (K, bias, rel_bias, rel_bias_mcse, sd, sd_mcse, se_sd,
+##         rb_var, rb_var_mcse,
 ##         coverage, coverage_mcse), and results/screening.rds, the
 ##         convergence, outlier, and inadmissibility counts.
 ## The objects `res`, `res_s`, `summ`, `scr`, `ns`, `rels`, and `est` remain
@@ -54,13 +55,17 @@ summ <- do.call(rbind, lapply(split(res_s, res_s[c("n", "rel", "estimator", "par
     tp <- x$true[1]
     ab <- calc_absolute(x, estimates = estimate, true_param = tp,
                         criteria = c("bias", "stddev"))
+    rl <- calc_relative(x, estimates = estimate, true_param = tp,
+                        criteria = "relative bias")
     rv <- calc_relative_var(x, estimates = estimate, var_estimates = se^2,
                             criteria = "relative bias")
     cv <- calc_coverage(x, lower_bound = ci_lower, upper_bound = ci_upper,
                         true_param = tp, criteria = "coverage")
     data.frame(x[1, c("n", "rel", "estimator", "parameter")],
                K = ab$K_absolute,
-               bias = ab$bias, sd = ab$stddev, sd_mcse = ab$stddev_mcse,
+               bias = ab$bias,
+               rel_bias = rl$rel_bias - 1, rel_bias_mcse = rl$rel_bias_mcse,
+               sd = ab$stddev, sd_mcse = ab$stddev_mcse,
                se_sd = mean(x$se) / ab$stddev,
                rb_var = rv$rel_bias_var, rb_var_mcse = rv$rel_bias_var_mcse,
                coverage = cv$coverage, coverage_mcse = cv$coverage_mcse)
