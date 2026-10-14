@@ -63,7 +63,7 @@ data set with the four estimators (`lavaan::sem` with `estimator = "JS"`,
 `"JSA"`, `"IV"`, and `"ML"`, all with a mean structure). It stores the
 estimates, standard errors, and confidence intervals of every free parameter
 other than the intercepts. One seed (`1234`) is set before the loop. The run
-takes about 45 minutes on an Apple M4 Pro with 24 GB of memory running macOS
+takes about 55 minutes on an Apple M4 Pro with 24 GB of memory running macOS
 Sequoia 15.7.3.
 
 ### Step 2: Screen the replications and compute the performance measures
@@ -119,8 +119,8 @@ packages needed by apaquarto. The environment provides:
 | knitr      | 1.51       |
 | Quarto     | 1.8.26     |
 
-The committed results in `results/` were produced with the same lavaan
-version under R 4.4.3 on macOS. The manuscript PDF in this repository is
+The committed results in `results/` were produced inside this environment
+(`nix-shell --pure`). The manuscript PDF in this repository is
 rendered on GitHub Actions inside the Nix environment.
 
 ## Three Ways to Reproduce the Article
@@ -167,7 +167,7 @@ Install R, Quarto, and the packages in the table above, as close to the listed
 versions as you can, and run the scripts directly:
 
 ```sh
-Rscript simulation.R                 # optional, about 45 minutes; results/replications.rds is committed
+Rscript simulation.R                 # optional, about 55 minutes; results/replications.rds is committed
 Rscript performance_calculation.R    # → results/performance.rds, results/screening.rds
 quarto render miiv_js_estimation.qmd # → miiv_js_estimation.pdf
 ```

@@ -4,7 +4,7 @@
 ## Generates the data and fits the four estimators in every replication.
 ## Output: results/replications.rds, one row per replication, estimator, and
 ## estimand (n, rel, replication, estimator, parameter, true, estimate, se,
-## ci_lower, ci_upper). Runtime is about 45 minutes on an Apple M4 Pro with
+## ci_lower, ci_upper). Runtime is about 55 minutes on an Apple M4 Pro with
 ## 24 GB of memory running macOS Sequoia 15.7.3.
 
 library(lavaan)
