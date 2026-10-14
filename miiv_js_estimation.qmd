@@ -873,8 +873,8 @@ $$
 \in\mathbb{R}^{d\times h}.
 $$
 
-The Jacobian is evaluated analytically by differentiating the estimation
-steps. For reweighted least squares, the derivative is obtained by implicit
+The Jacobian is evaluated analytically by default by differentiating the
+estimation steps. For reweighted least squares, the derivative is obtained by implicit
 differentiation of the converged estimating equations. The Jacobian
 propagates uncertainty through the preliminary error variance estimates,
 reliability adjustments, estimates of the factor loadings and latent
@@ -895,8 +895,12 @@ $$
 \in[0,\infty).
 $$
 
-The same delta method construction applies to the complete MIIV estimation
-map when moment based standard errors are used.
+For MIIV factor loadings and latent regression slopes, moment based
+covariance estimates are also available as
+$n^{-1}\widehat{\mathbf{K}}\widehat{\boldsymbol{\Gamma}}_S\widehat{\mathbf{K}}^{\top}$.
+Together with the second stage expression and the mean structure step
+above, these provide delta method standard errors calculated separately
+for each parameter block.
 
 # Simulation Design and Performance Evaluation
 
@@ -1055,118 +1059,18 @@ All analyses were conducted in R [@rcoreteam_2025] using the lavaan package
 performance evaluation, and ggplot2 [@wickham_2016] for the figures. The
 computational environment was pinned with Nix [@dolstra_etall_2004] via the
 rix package [@rodrigues_baumann_2026], and the article was written with the
-apaquarto extension [@schneider_2026]. For the R version, package versions,
-code, manuscript, and materials, see the project repository.
-
-```{r}
-#| label: simulation
-#| cache: true
-library(lavaan)
-set.seed(1234)
-
-lam <- c(1, 0.8, 1.2, 1.0, 1, 0.9, 1.1, 1.0, 1, 0.9, 1.1, 1.0)
-var_eta <- rep(1, 12)
-pop_model <- function(rel) {
-  theta <- lam^2 * var_eta * (1 - rel) / rel
-  paste0('
-  eta1 =~ 1*y1 + 0.8*y2 + 1.2*y3 + 1.0*y4
-  eta2 =~ 1*y5 + 0.9*y6 + 1.1*y7 + 1.0*y8
-  eta3 =~ 1*y9 + 0.9*y10 + 1.1*y11 + 1.0*y12
-  eta2 ~ 0.6*eta1
-  eta3 ~ 0.3*eta1 + 0.5*eta2
-  eta1 ~~ 1*eta1; eta2 ~~ 0.64*eta2; eta3 ~~ 0.48*eta3
-  eta1 ~ 1*1; eta2 ~ 0.5*1; eta3 ~ 0.5*1
-  y2 ~ 0.2*1; y3 ~ 0.2*1; y4 ~ 0.2*1; y6 ~ 0.2*1; y7 ~ 0.2*1; y8 ~ 0.2*1
-  y10 ~ 0.2*1; y11 ~ 0.2*1; y12 ~ 0.2*1
-  ', paste0("y", 1:12, " ~~ ", round(theta, 4), "*y", 1:12, collapse = "; "))
-}
-mod <- '
-  eta1 =~ y1 + y2 + y3 + y4
-  eta2 =~ y5 + y6 + y7 + y8
-  eta3 =~ y9 + y10 + y11 + y12
-  eta2 ~ eta1
-  eta3 ~ eta1 + eta2
-'
-ns <- c(100, 200, 300, 400, 500, 600); rels <- c(0.6, 0.8); R <- 1500
-cond <- expand.grid(n = ns, rel = rels)
-est <- c("JS", "JSA", "IV", "ML")
-
-one <- function(n, rel) {
-  pop <- pop_model(rel)
-  pt <- lavaanify(pop)
-  true <- setNames(pt$ustart, paste0(pt$lhs, pt$op, pt$rhs))
-  d <- simulateData(pop, sample.nobs = n)
-  do.call(rbind, lapply(est, function(e) {
-    fit <- try(sem(mod, data = d, estimator = e, meanstructure = TRUE),
-               silent = TRUE)
-    if (inherits(fit, "try-error") || !lavInspect(fit, "converged"))
-      return(NULL)
-    pe <- parameterEstimates(fit, remove.nonfree = TRUE)
-    pe <- pe[pe$op != "~1", ]
-    par <- paste0(pe$lhs, pe$op, pe$rhs)
-    data.frame(n = n, rel = rel, estimator = e, par = par, true = true[par],
-               est = pe$est, se = pe$se,
-               ci.lower = pe$ci.lower, ci.upper = pe$ci.upper)
-  }))
-}
-res <- do.call(rbind, lapply(seq_len(nrow(cond)), function(i)
-  do.call(rbind, replicate(R, one(cond$n[i], cond$rel[i]),
-                           simplify = FALSE))))
-
-```
+apaquarto extension [@schneider_2026]. The replication level estimates,
+standard errors, and confidence intervals, the performance measures, and
+the screening counts are saved as R data files in the project repository,
+together with the R version, package versions, code, and manuscript.
 
 ```{r}
 #| label: performance
-library(simhelpers)
+source("performance_calculation.R")
 library(ggplot2)
-
-## screening: convergence, outliers, inadmissible solutions
-res$cond <- paste(res$n, res$rel)
-res$rep <- ave(as.integer(res$estimator == est[1] & res$par == res$par[1]),
-               res$cond, FUN = cumsum)
-nonfinite <- !is.finite(res$est) | !is.finite(res$se) |
-  !is.finite(res$ci.lower) | !is.finite(res$ci.upper)
-nonconv <- unique(res[nonfinite, c("cond", "rep", "estimator")])
-res_c <- res[!paste(res$cond, res$rep) %in% paste(nonconv$cond, nonconv$rep), ]
-out <- do.call(rbind, lapply(split(res_c, res_c[c("cond", "estimator", "par")]),
-  function(x) {
-    q <- quantile(x$est, c(0.25, 0.75)); iqr <- q[2] - q[1]
-    flag <- x$est < q[1] - 3 * iqr | x$est > q[2] + 3 * iqr
-    if (!any(flag)) NULL else
-      data.frame(cond = x$cond[1], estimator = x$estimator[1], rep = x$rep[flag])
-  }))
-out_rep <- unique(out[c("cond", "rep")])
-res_s <- res_c[!paste(res_c$cond, res_c$rep) %in% paste(out_rep$cond, out_rep$rep), ]
-inad <- unique(res[grepl("~~", res$par) & res$est <= 0, c("cond", "estimator", "rep")])
-scr <- list(
-  nonconv = nrow(nonconv),
-  removed = nrow(out_rep),
-  removed_pct = 100 * nrow(out_rep) / (R * nrow(cond)),
-  removed_by_cond = sort(100 * table(out_rep$cond) / R, decreasing = TRUE),
-  flagged_by_est = 100 * table(unique(out[c("cond", "estimator", "rep")])$estimator) / (R * nrow(cond)),
-  flagged_100_06 = 100 * table(factor(unique(out[out$cond == "100 0.6", c("estimator", "rep")])$estimator, levels = est)) / R,
-  inad = nrow(inad),
-  inad_by = table(inad$estimator, inad$cond))
-
-summ <- do.call(rbind, lapply(split(res_s, res_s[c("n", "rel", "estimator", "par")]),
-  function(x) {
-    tp <- x$true[1]
-    ab <- calc_absolute(x, estimates = est, true_param = tp,
-                        criteria = c("bias", "stddev"))
-    rv <- calc_relative_var(x, estimates = est, var_estimates = se^2,
-                            criteria = "relative bias")
-    cv <- calc_coverage(x, lower_bound = ci.lower, upper_bound = ci.upper,
-                        true_param = tp, criteria = "coverage")
-    data.frame(x[1, c("n", "rel", "estimator", "par")],
-               bias = ab$bias, sd = ab$stddev, sd_mcse = ab$stddev_mcse,
-               rb_var = rv$rel_bias_var, rb_var_mcse = rv$rel_bias_var_mcse,
-               coverage = cv$coverage, coverage_mcse = cv$coverage_mcse,
-               reps = ab$K_absolute)
-  }))
-rownames(summ) <- NULL
-summ$class <- ifelse(grepl("=~", summ$par), "Loadings",
-               ifelse(grepl("~~", summ$par),
-                      ifelse(grepl("^eta", summ$par), "Factor variances",
+summ$class <- ifelse(grepl("=~", summ$parameter), "Loadings",
+               ifelse(grepl("~~", summ$parameter),
+                      ifelse(grepl("^eta", summ$parameter), "Factor variances",
                              "Residual variances"), "Structural"))
 summ$estimator <- factor(summ$estimator,
                          levels = c("JS", "JSA", "IV", "ML"))
@@ -1176,7 +1080,7 @@ crit <- c(sd = "SD", rb_var = "SE²/VAR", coverage = "Coverage")
 mcse <- c(sd = "sd_mcse", rb_var = "rb_var_mcse", coverage = "coverage_mcse")
 cap <- 1.5
 long <- do.call(rbind, lapply(names(crit), function(k)
-  data.frame(summ[c("n", "rel", "estimator", "par", "class")],
+  data.frame(summ[c("n", "rel", "estimator", "parameter", "class")],
              criterion = crit[k],
              value = summ[[k]],
              mcse = summ[[mcse[k]]])))
@@ -1223,13 +1127,13 @@ plot_perf <- function(v, col, labeller = "label_value", breaks = ns) {
           panel.border = element_rect(fill = NA, colour = "grey80"))
 }
 plot_params <- function(pars, labels, breaks = ns) {
-  v <- long[long$par %in% pars, ]
-  v$par <- factor(v$par, levels = pars, labels = labels)
+  v <- long[long$parameter %in% pars, ]
+  v$parameter <- factor(v$parameter, levels = pars, labels = labels)
   v$rel <- factor(v$rel, levels = rels,
                   labels = paste("Reliability", sub("^0", "", rels)))
   v$lower <- v$value - v$mcse; v$upper <- v$value + v$mcse
-  plot_perf(clip(v), "par", labeller = labeller(par = label_parsed),
-            breaks = breaks)
+  plot_perf(clip(v), "parameter",
+            labeller = labeller(parameter = label_parsed), breaks = breaks)
 }
 pars_coef <- c("eta2~eta1", "eta3~eta1", "eta3~eta2")
 lab_coef  <- c("B[21]", "B[31]", "B[32]")
