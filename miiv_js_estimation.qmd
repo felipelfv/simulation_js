@@ -922,10 +922,10 @@ $$ {#eq-pop-structural}
 The design is partly based on previous studies. @burghgraeve_etall_2021
 used four indicators per latent variable, a common reliability of .6 or .8
 for all indicators. Note also that the model is similar to the empirical 
-illustration @burghgraeve_etall_2021. Moreover, 
+illustration in @burghgraeve_etall_2021. Moreover, 
 @jin_etall_2021 used a recursive latent variable model with several equations 
 and standardized slopes between 0.1 and 0.6, 
-which the present model follows with $B_{21}=0.6$, $B_{31}=0.3$, and
+which the present model follows partly with $B_{21}=0.6$, $B_{31}=0.3$, and
 $B_{32}=0.5$. With $\operatorname{Var}(\eta_1)=1$,
 $\operatorname{Var}(\zeta_2)=0.64$, and $\operatorname{Var}(\zeta_3)=0.48$,
 the variances of $\eta_2$ and $\eta_3$ equal 1, so that the slopes
@@ -941,7 +941,7 @@ and disturbance variances.
 ```{tikz}
 %| label: fig-model
 %| fig-cap: "Path diagram of the simulation model with three latent variables and their indicators."
-%| apa-note: "NoNote *Note.* Scaling indicator loadings are fixed to one. The population latent regression slopes are $B_{21} = 0.6$, $B_{31} = 0.3$, and $B_{32} = 0.5$."
+%| apa-note: "NoNote *Note.* Scaling indicator loadings are fixed to one. The population latent regression slopes are $B_{21} = 0.6$, $B_{31} = 0.3$, and $B_{32} = 0.5$. Intercepts, measurement errors, disturbances, and variances are omitted for clarity."
 %| echo: false
 %| fig-ext: pdf
 %| out-width: "80%"
@@ -990,7 +990,7 @@ conditions of @burghgraeve_etall_2021 and determine the size of the
 reliability adjustment in the James–Stein estimators.
 
 As highlighted, we investigated the JS, JSA, MIIV-2SLS, and ML approaches, all
-with the default options in lavaan. 
+with the default options in lavaan [@rosseel_2012]. 
 
 ### Data Generation
 
@@ -1005,8 +1005,7 @@ where $\lambda$ is the loading of that indicator, so that every indicator
 has reliability $\rho$ in its condition, and the indicators follow by the
 measurement equations. The observed variables are therefore multivariate
 normal with the mean vector and covariance matrix implied by the
-population values. All four estimators were applied to the same data
-sets.
+population values. 
 
 ### Convergence, Outliers, and Inadmissible Solutions
 
@@ -1059,10 +1058,9 @@ All analyses were conducted in R [@rcoreteam_2025] using the lavaan package
 performance evaluation, and ggplot2 [@wickham_2016] for the figures. The
 computational environment was pinned with Nix [@dolstra_etall_2004] via the
 rix package [@rodrigues_baumann_2026], and the article was written with the
-apaquarto extension [@schneider_2026]. The replication level estimates,
-standard errors, and confidence intervals, the performance measures, and
-the screening counts are saved as R data files in the project repository,
-together with the R version, package versions, code, and manuscript.
+apaquarto extension [@schneider_2026]. For an extensive description of all
+files and how to reproduce the simulation study as well as the manuscript,
+see the repository.
 
 ```{r}
 #| label: performance
