@@ -5,11 +5,11 @@ This repository contains the code, results, and manuscript for the article
 Structural Equation Models: A Case Study With lavaan"** by Felipe Fontana
 Vieira and Yves Rosseel.
 
-The article sets out model-implied instrumental-variable two-stage least
-squares (MIIV-2SLS) and the scaling and aggregated James–Stein estimators as
+The article sets out model-implied instrumental-variable (MIIV) estimation
+and the scaling and aggregated James–Stein estimators as
 implemented in lavaan, states the delta method standard errors for the
 James–Stein estimators, and evaluates the standard errors of all four
-estimators (JS, JSA, MIIV-2SLS, ML) in a simulation study with 6 sample sizes
+estimators (JS, JSA, MIIV, ML) in a simulation study with 6 sample sizes
 × 2 reliability levels = 12 conditions, each run for 1,500 replications.
 
 <sub>The code in this repository is licensed under the [MIT License](LICENSE).
@@ -172,9 +172,11 @@ Rscript performance_calculation.R    # → results/performance.rds, results/scre
 quarto render miiv_js_estimation.qmd # → miiv_js_estimation.pdf
 ```
 
-lavaan must be version 0.7-3 or later, the first CRAN release with the `JS`,
-`JSA`, and `IV` estimators (published 2026-10-08). `install.packages("lavaan")`
-is sufficient. To match the exact development build used for the committed
+lavaan must be version 0.7-3 or later (published on CRAN 2026-10-08). The
+`IV` estimator first appeared in 0.7-2, and 0.7-3 is the first release in
+which `JS` and `JSA` handle latent regressions and provide analytical standard
+errors; earlier releases restricted them to confirmatory factor models.
+`install.packages("lavaan")` is sufficient. To match the exact development build used for the committed
 results:
 
 ```r
