@@ -171,8 +171,10 @@ Rscript performance_calculation.R    # → results/performance.rds, results/scre
 quarto render miiv_js_estimation.qmd # → miiv_js_estimation.pdf
 ```
 
-lavaan must be the development version 0.7-3 or later, since the `JS` and
-`JSA` estimators are not in the CRAN release at the time of writing:
+lavaan must be version 0.7-3 or later, the first CRAN release with the `JS`,
+`JSA`, and `IV` estimators (published 2026-10-08). `install.packages("lavaan")`
+is sufficient. To match the exact development build used for the committed
+results:
 
 ```r
 remotes::install_github("yrosseel/lavaan@54b89fb9b8c1c9257edfcc39ea0f44b4f6e92af3")
