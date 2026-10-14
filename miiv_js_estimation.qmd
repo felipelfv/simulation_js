@@ -54,7 +54,7 @@ author-note:
 abstract: |
   This article presents model-implied instrumental-variable
   (MIIV) estimation and scaling (JS) and aggregated (JSA) James–Stein
-  estimation within a common notation, following their implementation in the R 
+  estimation within a common notation, based on their implementation in the R 
   package lavaan. We describe the estimation of factor loadings and latent 
   regression slopes equation by equation, followed by the estimation of variance,
   covariance, and intercept parameters. We also provide analytical standard 
@@ -138,16 +138,17 @@ confirmatory factor models by @dhaene_rosseel_2024.
 Beyond point estimation, the usefulness of these approaches for statistical
 inference depends on the accuracy of their standard errors. For MIIV,
 conventional standard errors for factor loadings and latent regression slopes
-follow from two-stage least squares [@bollen_1996]. For variance and
-covariance parameters estimated subsequently by unweighted least squares,
-standard errors accounting for the previously estimated loadings and latent
-regression slopes were derived by @bollen_maydeuolivares_2007 and generalized
-to other weight matrices by @jin_etall_2021. These calculations require 
-derivatives of the estimated loadings and
-latent regression slopes with respect to the sample moments, for which
-@fisher_bollen_2020 provided explicit analytical expressions. More recently, @maydeuolivares_etall_2026 compared
-subsequent variance and covariance estimation procedures and the accuracy of
-their standard errors. For James–Stein estimation, @burghgraeve_etall_2021 derived a sampling
+follow from two-stage least squares [@bollen_1996]. Standard errors for these
+same estimates can also be obtained by the delta method, using derivatives
+with respect to the sample moments, for which @fisher_bollen_2020 provided
+explicit analytical expressions. These derivatives also propagate uncertainty
+in the estimated loadings and slopes into the standard errors of subsequently
+estimated variance and covariance parameters. Standard errors for these latter
+parameters were derived under unweighted least squares by
+@bollen_maydeuolivares_2007 and extended to general weight matrices by
+@jin_etall_2021. More recently, @maydeuolivares_etall_2026 compared subsequent
+variance and covariance estimation procedures and the accuracy of their
+standard errors. For James–Stein estimation, @burghgraeve_etall_2021 derived a sampling
 variance expression for latent regression estimates that accounts for
 uncertainty in the estimated reliability adjustment, providing a basis for
 analytical standard errors for those estimates. However, they did not develop
@@ -999,9 +1000,8 @@ replicated 1,500 times. The sample sizes cover the small to moderate range
 in which the equation by equation estimators are expected to differ most
 from ML. The reliability levels match the low and high
 conditions of @burghgraeve_etall_2021 and determine the size of the
-reliability adjustment in JS and JSA.
-
-As highlighted, we investigated the JS, JSA, MIIV, and ML approaches, all
+reliability adjustment in JS and JSA. As highlighted throughout the article, 
+we investigated the JS, JSA, MIIV, and ML approaches, all
 with the default options in lavaan [@rosseel_2012]. 
 
 ### Data Generation
@@ -1069,8 +1069,9 @@ All analyses were conducted in R [@rcoreteam_2025] using the lavaan package
 [@rosseel_2012] for estimation, simhelpers [@joshi_pustejovsky_2025] for
 performance evaluation, and ggplot2 [@wickham_2016] for the figures. The
 computational environment was pinned with Nix [@dolstra_etall_2004] via the
-rix package [@rodrigues_baumann_2026], and the article was written with the
-apaquarto extension [@schneider_2026]. For an extensive description of all
+rix package [@rodrigues_baumann_2026], and a Dockerfile that builds the same
+environment inside a container is also provided. The article was written
+with the apaquarto extension [@schneider_2026]. For an extensive description of all
 files and how to reproduce the simulation study as well as the manuscript,
 see the repository.
 
@@ -1284,9 +1285,11 @@ in small samples, whereas the analytical standard errors here are too
 large at reliability .6 and $n\le200$, a difference between the two ways
 of obtaining them that remains to be examined.
 
-That said, we hope this further instigates to researchers to evaluate all 
-approaches under a variety of conditions, including misspecifications at the 
-distributional and measurement level. 
+That said, our goal with this study was not to conduct an exhaustive simulation 
+to compare both approaches. We hope this article further instigates to 
+researchers to evaluate MIIV in contrast to JS and JSA, under a variety of 
+conditions, including misspecifications at the distributional and measurement 
+level. 
 
 \newpage{}
 
