@@ -24,6 +24,7 @@ The manuscript, figures, and other non-code content are licensed under a
 ├── default.nix                # generated environment definition (built with nix-shell)
 ├── Dockerfile                 # containerised build: installs Nix, builds the environment, renders the manuscript
 ├── .dockerignore              # trims the Docker build context (excludes .git, result, caches)
+├── run_all.R                  # runs simulation.R and then performance_calculation.R
 ├── simulation.R               # data generation and estimation → results/replications.rds
 ├── performance_calculation.R  # screening and performance measures → results/{performance,screening}.rds
 ├── results/
@@ -48,6 +49,15 @@ which builds the Nix environment and renders the manuscript from the saved
 results.
 
 ## Pipeline
+
+`run_all.R` runs Steps 1 and 2 in sequence, so the whole simulation pipeline
+can be reproduced with a single command:
+
+```sh
+nix-shell --pure --run 'Rscript run_all.R'
+```
+
+The steps can also be run separately, as described below.
 
 The pipeline has three stages. Each stage reads the previous stage's output,
 so the manuscript can be rendered from the committed results without rerunning
@@ -138,7 +148,7 @@ and [on Linux and Windows](https://docs.ropensci.org/rix/articles/setting-up-lin
 ```sh
 nix-build                                                        # builds the environment
 nix-shell --pure --run 'quarto render miiv_js_estimation.qmd'    # renders from the committed results
-nix-shell --pure --run 'Rscript simulation.R'                    # optional: reruns the simulation first
+nix-shell --pure --run 'Rscript run_all.R'                       # optional: reruns the simulation and performance measures first
 ```
 
 ### 2. Docker
@@ -159,7 +169,7 @@ docker run --rm -v "$PWD/docs:/project/docs" miiv-js-manuscript
 # Option 2: rerun the simulation and the performance calculation, then render;
 # the .rds files are written to your local results/ folder and the PDF to docs/
 docker run --rm -v "$PWD/results:/project/results" -v "$PWD/docs:/project/docs" miiv-js-manuscript \
-  nix-shell default.nix --run "Rscript simulation.R && Rscript performance_calculation.R && quarto render miiv_js_estimation.qmd && cp miiv_js_estimation.pdf docs/"
+  nix-shell default.nix --run "Rscript run_all.R && quarto render miiv_js_estimation.qmd && cp miiv_js_estimation.pdf docs/"
 ```
 
 ### 3. Plain R, without Nix or Docker
@@ -168,8 +178,8 @@ Install R, Quarto, and the packages in the table above, as close to the listed
 versions as you can, and run the scripts directly:
 
 ```sh
-Rscript simulation.R                 # optional, about 55 minutes; results/replications.rds is committed
-Rscript performance_calculation.R    # → results/performance.rds, results/screening.rds
+Rscript run_all.R                    # optional, about 55 minutes; runs simulation.R and performance_calculation.R
+                                     #   (results/ is committed, so this can be skipped)
 quarto render miiv_js_estimation.qmd # → miiv_js_estimation.pdf
 ```
 

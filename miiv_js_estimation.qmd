@@ -107,6 +107,15 @@ execute:
   message: false
 ---
 
+```{r}
+#| label: setup
+#| include: false
+library(lavaan)
+library(simhelpers)
+library(ggplot2)
+library(knitr)
+```
+
 Structural equation models (SEMs) with latent variables are usually estimated
 by maximum likelihood (ML), which estimates all parameters jointly. Although
 ML has desirable asymptotic properties when its assumptions hold,
@@ -1084,7 +1093,6 @@ see the repository.
 ```{r}
 #| label: performance
 source("performance_calculation.R")
-library(ggplot2)
 pct <- function(x) sprintf("%.1f", 100 * x)
 rb_other <- max(abs(summ$rel_bias[summ$estimator != "IV"]))
 rb_iv100 <- summ[summ$estimator == "IV" & summ$n == 100 & summ$rel == 0.6, ]
