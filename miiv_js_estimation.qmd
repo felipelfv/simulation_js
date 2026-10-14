@@ -1156,9 +1156,9 @@ replications were removed, flagged mainly through JS
 (`r sprintf("%.1f", scr$flagged_100_06["JS"])`% of the replications in that
 condition). In every other condition fewer than 0.5% of the replications were
 removed. Inadmissible solutions occurred in `r scr$inad` replications, all
-for JS at $n=100$ with reliability .6, where a residual or disturbance
-variance estimate was nonpositive. They are included in the results
-below.
+for JS at $n=100$ with reliability .6, where a disturbance variance
+estimate was negative. All of them were also flagged by the outlier
+screening, so none enters the results below.
 
 ## Standard Error Performance
 
@@ -1169,20 +1169,19 @@ the lower half. @fig-sim-structural shows the latent regression slopes,
 one nonscaling indicator per latent variable, and @fig-sim-factorvar the
 variance of $\eta_1$ and the two disturbance variances. The loadings and
 residual variances not shown behave like those shown for the same latent
-variable, with SE$^2$/VAR ratios within 0.14 and coverage within .03 of
+variable, with SE$^2$/VAR ratios within 0.15 and coverage within .03 of
 each other in every condition.
 
-From $n=300$ onward, the four estimators are indistinguishable within
-Monte Carlo error. The SE$^2$/VAR ratio stays within 0.11 of one and
+Notably, from $n=300$ onward, the four estimators are indistinguishable 
+within Monte Carlo error. The SE$^2$/VAR ratio stays within 0.12 of one and
 coverage within .035 of .95 for every estimator and parameter at both
-reliability levels, and the curves move together across sample sizes
-because they are computed on the same data sets. Three differences appear
-at $n=100$ and $n=200$, mainly at reliability .6.
+reliability levels, and the curves move together across sample sizes. However, 
+three differences appear at $n=100$ and $n=200$, mainly at reliability .6.
 
 First, the scaling James–Stein standard errors for the slopes $B_{31}$
 and $B_{32}$ are too large at reliability .6, with SE$^2$/VAR ratios of
-1.5 to 1.6 at $n=100$ and 1.13 at $n=200$ and coverage of .96 to .98,
-while the SD is also the largest of the four, 0.24 against 0.13 to 0.17
+1.5 to 1.6 at $n=100$ and 1.13 to 1.14 at $n=200$ and coverage of .96 to
+.98, while the SD is also the largest of the four, 0.24 against 0.13 to 0.17
 at $n=100$. In some replications the reliability adjustment for the
 equation of $\eta_3$ implies a correlation between $\eta_1$ and $\eta_2$
 close to one, so that the fitted predictors are nearly collinear and both
@@ -1192,12 +1191,12 @@ The aggregated estimator, which pools all indicators of a latent
 variable, is unaffected.
 
 Second, the MIIV loadings undercover at reliability .6, with coverage of
-.88 to .89 at $n=100$ against .93 to .95 for the other estimators, while
-the MIIV SE$^2$/VAR ratio is 1.05 to 1.07 and its SD the smallest. The
-gap comes from a downward bias of about 0.06 in the two-stage least
-squares loadings when the scaling indicators are unreliable, a weak
-instrument effect also reported by @jin_etall_2021, and it fades slowly
-with sample size.
+.88 to .90 at $n=100$ against .93 to .96 for the other estimators, while
+the MIIV SE$^2$/VAR ratio lies between 0.98 and 1.14 and its SD is the
+smallest. The gap comes from a downward bias of 0.06 to 0.08 in the
+two-stage least squares loadings when the scaling indicators are unreliable, 
+a weak instrument effect also reported by @jin_etall_2021, and it fades 
+slowly with sample size.
 
 Third, the disturbance variances separate the estimators at $n=100$. ML
 undercovers them, at .91 to .94, although its SE$^2$/VAR ratio is close
@@ -1205,7 +1204,7 @@ to one, MIIV overcovers them, at .96 to .97, with ratios of 1.11 to 1.18,
 and the James–Stein estimators lie in between. At reliability .8 the
 disturbance variance of $\eta_2$ is undercovered at .92 by ML and by both
 James–Stein estimators alike. The residual variances show no such
-contrast, with coverage between .92 and .96 for all estimators and a
+contrast, with coverage between .91 and .96 for all estimators and a
 common dip at $n=100$.
 
 ```{r}
@@ -1249,6 +1248,35 @@ plot_params(pars_fvar, lab_fvar)
 ```
 
 \newpage{}
+
+# Discussion
+
+With this article, we described the current implementation of mostly non 
+iterative estimation approaches in the R package lavaan. On top of that, we also
+extended and illustrated analytical standard errors for the james-stein approach. 
+Building on this, an evaluation was conducted through a reproducible simulation 
+study. 
+
+The results line up with the three studies that motivated the design.
+@bollen_2018, summarizing @bollen_etall_2007, reports few differences
+between MIIV-2SLS and ML under a correctly specified model with normal
+data. Similar results were obtained here for the standard errors performance.
+Moreover, @jin_etall_2021 found that scaling indicators with low reliability 
+bias the MIIV estimates in small samples and that the MIIV standard errors of
+the variance parameters are the least accurate. Both patterns reappear at
+reliability .6 and $n=100$, as the loading bias with its undercoverage and
+the inflated standard errors of the latent and disturbance variances. Last, 
+@burghgraeve_etall_2021 found the scaling James–Stein estimator markedly
+less efficient than the aggregated one for the latent regression and the
+aggregated estimator competitive with ML, which the SDs here confirm.
+Their bootstrap standard errors for the scaling estimator were too small
+in small samples, whereas the analytical standard errors here are too
+large at reliability .6 and $n\le200$, a difference between the two ways
+of obtaining them that remains to be examined.
+
+That said, we hope this further instigates to researchers to evaluate all 
+approaches under a variety of conditions, including misspecifications at the 
+distributional and measurement level. 
 
 # References
 
