@@ -128,5 +128,63 @@ docker run --rm -v "$PWD/results:/project/results" -v "$PWD/docs:/project/docs" 
 package. It pins R and all R packages to the `rstats-on-nix` snapshot of
 2026-05-11, lavaan to the GitHub commit carrying development version
 0.7-3.3292 (the version used for the results), and the Quarto CLI and TeX
-packages needed by apaquarto. With Nix installed, `nix-build` creates the
-environment and `nix-shell` enters it.
+packages needed by apaquarto. The environment provides:
+
+| Software   | Version    |
+|------------|------------|
+| R          | 4.6.0      |
+| lavaan     | 0.7-3.3292 (GitHub commit `54b89fb`) |
+| simhelpers | 0.3.1      |
+| ggplot2    | 4.0.3      |
+| knitr      | 1.51       |
+| Quarto     | 1.8.26     |
+
+The committed results in `results/` were produced with the same lavaan
+version under R 4.4.3 on macOS. The manuscript PDF in this repository is
+rendered on GitHub Actions inside the Nix environment.
+
+## Three Ways to Reproduce the Article
+
+### 1. Nix on your own machine
+
+Install Nix and build the pinned environment from the committed
+`default.nix`, then run the pipeline inside it. The rix documentation
+explains how to install Nix and use the environment:
+[Getting Started](https://docs.ropensci.org/rix/articles/getting-started.html),
+[Setting Up and Using Nix and Rix on macOS](https://docs.ropensci.org/rix/articles/setting-up-macos.html),
+and [on Linux and Windows](https://docs.ropensci.org/rix/articles/setting-up-linux-windows.html).
+
+```sh
+nix-build                                                        # builds the environment
+nix-shell --pure --run 'quarto render miiv_js_estimation.qmd'    # renders from the committed results
+nix-shell --pure --run 'Rscript simulation.R'                    # optional: reruns the simulation first
+```
+
+### 2. Docker
+
+Only Docker is required. The container installs Nix and builds the same
+pinned environment. See "Reproducing with Docker" above for the two run
+options, rendering from the committed results or rerunning the simulation.
+
+### 3. Plain R, without Nix or Docker
+
+Install R, Quarto, and the packages in the table above, as close to the listed
+versions as you can, and run the scripts directly:
+
+```sh
+Rscript simulation.R                 # optional, about 45 minutes; results/replications.rds is committed
+Rscript performance_calculation.R    # → results/performance.rds, results/screening.rds
+quarto render miiv_js_estimation.qmd # → miiv_js_estimation.pdf
+```
+
+lavaan must be the development version 0.7-3 or later, since the `JS` and
+`JSA` estimators are not in the CRAN release at the time of writing:
+
+```r
+remotes::install_github("yrosseel/lavaan@54b89fb9b8c1c9257edfcc39ea0f44b4f6e92af3")
+```
+
+Rendering the manuscript also needs the TeX packages used by apaquarto;
+`quarto install tinytex` followed by the render will install the missing
+ones. Results obtained this way should match the committed ones up to
+differences in the numerical libraries of your platform.
