@@ -2,7 +2,7 @@ library(rix)
 
 # Reproducible environment for the MIIV / James-Stein simulation manuscript.
 # The simulation results in the manuscript were produced with the lavaan
-# development version 0.7-2.3274, pinned below to its GitHub commit.
+# development version 0.7-3.3292, pinned below to its GitHub commit.
 rix(date = "2026-05-11", # available_dates(); 1.8.x quarto (1.9.37 has a pandoc bug)
     r_pkgs = c("ggplot2", "simhelpers",
                "knitr"),                   # knitr: R engine quarto uses for code chunks
@@ -21,7 +21,7 @@ rix(date = "2026-05-11", # available_dates(); 1.8.x quarto (1.9.37 has a pandoc 
     git_pkgs = list(
       list(package_name = "lavaan",
            repo_url = "https://github.com/yrosseel/lavaan",
-           commit = "f16c655227ebf999ac39681eb744172c2d7bde6c")
+           commit = "54b89fb9b8c1c9257edfcc39ea0f44b4f6e92af3")
     ),
     project_path = ".",
     overwrite = TRUE
