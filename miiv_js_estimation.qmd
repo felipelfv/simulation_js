@@ -9,7 +9,7 @@ author:
     email: felipe.fontanavieira@ugent.be
     affiliations:
       - name: Ghent University
-        department: Department of Data Analysis, Faculty of Psychology and Educational Sciences
+        department: Department of General and Applied Psychology, Faculty of Psychology and Educational Sciences
         address: Henri Dunantlaan 2
         city: Ghent
         country: Belgium
@@ -117,8 +117,8 @@ or end in inadmissible solutions, especially in small samples [@bollen_2018;
 [e.g., @bollen_1996; @burghgraeve_etall_2021]. In the approaches considered,
 factor loadings and latent regression slopes are estimated one equation at a
 time and in closed form, which may limit the propagation of misspecification
-across equations and avoids iterative optimization for this part of the
-estimation. Two such estimators are considered. Model-implied
+across equations [@bollen_gates_fisher_2018; @burghgraeve_etall_2021] and
+avoids iterative optimization for this part of the estimation. Two such estimators are considered. Model-implied
 instrumental-variable (MIIV) estimation replaces each latent variable by a
 scaling indicator and uses instruments implied by the model to correct for the
 resulting measurement error [@bollen_1996; @bollen_bauer_2004; @bollen_2018].
@@ -676,8 +676,10 @@ $$
 where $\mathbf{v}\in\mathbb{R}^{d_v}$ collects the free variance and
 covariance parameters.
 
-With fixed entries and linear equality restrictions incorporated into the
-parameterization,
+Conditional on the estimated loadings and slopes, the implied covariance
+moments are linear in the free variance and covariance parameters
+[@ernst_etall_2023]. Incorporating fixed entries and linear equality
+restrictions gives
 
 $$
 \operatorname{vech}\{\boldsymbol{\Sigma}(\mathbf{v})\}
@@ -708,8 +710,8 @@ $$
 $$
 assuming that $\widehat{\mathbf{G}}$ has full column rank.
 
-Reweighted least squares updates the normal theory weight matrix
-[@browne_1974] using the current implied covariance matrix:
+Reweighted least squares updates the normal theory weight matrix using the
+current implied covariance matrix [@browne_1974; @lee_jennrich_1979]:
 
 $$
 \widehat{\mathbf{W}}^{(\tau)}
@@ -908,7 +910,9 @@ covariance estimates are also available as
 $n^{-1}\widehat{\mathbf{K}}\widehat{\boldsymbol{\Gamma}}_S\widehat{\mathbf{K}}^{\top}$.
 Together with the second stage expression and the mean structure step
 above, these provide delta method standard errors calculated separately
-for each parameter block.
+for each parameter block. A related delta method calculation for
+instrumental variable regression is presented by
+@maydeuolivares_etall_2019.
 
 # Simulation Design and Performance Evaluation
 
