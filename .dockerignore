@@ -1,0 +1,10 @@
+result
+.quarto
+.git
+*_files
+*_cache
+.Rhistory
+.DS_Store
+literature
+Dockerfile
+.dockerignore

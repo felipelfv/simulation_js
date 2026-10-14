@@ -22,6 +22,8 @@ The manuscript, figures, and other non-code content are licensed under a
 .
 ├── gen_env.R                  # generates default.nix via {rix} (pinned R + packages + Quarto + TeX)
 ├── default.nix                # generated environment definition (built with nix-shell)
+├── Dockerfile                 # containerised build: installs Nix, builds the environment, renders the manuscript
+├── .dockerignore              # trims the Docker build context (excludes .git, result, caches)
 ├── simulation.R               # data generation and estimation → results/replications.rds
 ├── performance_calculation.R  # screening and performance measures → results/{performance,screening}.rds
 ├── results/
@@ -97,6 +99,27 @@ performance_calculation.R ──> results/performance.rds, results/screening.rds
                           │
                           ▼
 miiv_js_estimation.qmd ──> miiv_js_estimation.pdf
+```
+
+### Reproducing with Docker
+
+If you would rather not install Nix on your host, the `Dockerfile` installs Nix
+inside a container and builds the pinned environment for you. Only Docker is
+required. The image can either render the manuscript from the committed
+results or rerun the whole pipeline first.
+
+```bash
+# Build the image (installs Nix, builds default.nix)
+docker build -t miiv-js-manuscript .
+
+# Option 1: render the manuscript from the committed results;
+# the PDF is written to your local docs/ folder
+docker run --rm -v "$PWD/docs:/project/docs" miiv-js-manuscript
+
+# Option 2: rerun the simulation and the performance calculation, then render;
+# the .rds files are written to your local results/ folder and the PDF to docs/
+docker run --rm -v "$PWD/results:/project/results" -v "$PWD/docs:/project/docs" miiv-js-manuscript \
+  nix-shell default.nix --run "Rscript simulation.R && Rscript performance_calculation.R && quarto render miiv_js_estimation.qmd && cp miiv_js_estimation.pdf docs/"
 ```
 
 ## Reproducible Environment
