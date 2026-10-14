@@ -1,8 +1,10 @@
 library(rix)
 
 # Reproducible environment for the MIIV / James-Stein simulation manuscript.
-# The simulation results in the manuscript were produced with the lavaan
-# development version 0.7-3.3292, pinned below to its GitHub commit.
+# The simulation results in the manuscript were produced with the CRAN release
+# of lavaan 0.7-3 (published 2026-10-08). It is newer than the snapshot date and
+# not yet in the CRAN archive, so it is pinned to the 0.7-3 tag of the CRAN
+# GitHub mirror (cran/lavaan), which holds the exact CRAN source.
 rix(date = "2026-05-11", # available_dates(); 1.8.x quarto (1.9.37 has a pandoc bug)
     r_pkgs = c("ggplot2", "simhelpers",
                "knitr"),                   # knitr: R engine quarto uses for code chunks
@@ -20,8 +22,8 @@ rix(date = "2026-05-11", # available_dates(); 1.8.x quarto (1.9.37 has a pandoc 
                  "pdflscape", "babel-english"),
     git_pkgs = list(
       list(package_name = "lavaan",
-           repo_url = "https://github.com/yrosseel/lavaan",
-           commit = "54b89fb9b8c1c9257edfcc39ea0f44b4f6e92af3")
+           repo_url = "https://github.com/cran/lavaan",
+           commit = "3d10d4a43d8d15ee683b78d4d6e769804ca87c7c")   # tag 0.7-3
     ),
     project_path = ".",
     overwrite = TRUE

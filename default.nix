@@ -6,8 +6,8 @@
 #  > "knitr"),
 #  > system_pkgs = "quarto",
 #  > git_pkgs = list(list(package_name = "lavaan",
-#  > repo_url = "https://github.com/yrosseel/lavaan",
-#  > commit = "54b89fb9b8c1c9257edfcc39ea0f44b4f6e92af3")),
+#  > repo_url = "https://github.com/cran/lavaan",
+#  > commit = "3d10d4a43d8d15ee683b78d4d6e769804ca87c7c")),
 #  > tex_pkgs = c("amsmath",
 #  > "framed",
 #  > "fvextra",
@@ -29,8 +29,8 @@
 #  > "threeparttable",
 #  > "threeparttablex",
 #  > "multirow",
-#  >      "colortbl",
-#  > "xpatch",
+#  > "colortbl",
+#  >      "xpatch",
 #  > "lineno",
 #  > "fontawesome5",
 #  > "newtx",
@@ -67,9 +67,9 @@ let
     lavaan = (pkgs.rPackages.buildRPackage {
       name = "lavaan";
       src = pkgs.fetchgit {
-        url = "https://github.com/yrosseel/lavaan";
-        rev = "54b89fb9b8c1c9257edfcc39ea0f44b4f6e92af3";
-        sha256 = "sha256-dE1fgkf+oGScoYNm1ufZ6vVmNCU0Xjp5MTyOYjakboA=";
+        url = "https://github.com/cran/lavaan";
+        rev = "3d10d4a43d8d15ee683b78d4d6e769804ca87c7c";
+        sha256 = "sha256-3XpV8yMRQQ18gNe09OEFEJ30ARkKUO+zujoSs1BI4WA=";
       };
       propagatedBuildInputs = builtins.attrValues {
         inherit (pkgs.rPackages) 
