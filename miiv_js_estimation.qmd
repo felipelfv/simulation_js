@@ -1080,7 +1080,7 @@ knitr::asis_output(paste0("\\begin{center}\n",
 
 ### Reproducibility and Computational Details
 
-All analyses were conducted in R [@rcoreteam_2025] using the lavaan package
+All analyses were conducted in R [@rcoreteam_2026] using the lavaan package
 [@rosseel_2012] for estimation, simhelpers [@joshi_pustejovsky_2025] for
 performance evaluation, and ggplot2 [@wickham_2016] for the figures. The
 computational environment was pinned with Nix [@dolstra_etall_2004] via the
@@ -1285,8 +1285,6 @@ plot_params(pars_res, lab_res, breaks = c(100, 300, 500))
 #| out-width: "100%"
 plot_params(pars_fvar, lab_fvar)
 ```
-
-\newpage{}
 
 # Discussion
 
