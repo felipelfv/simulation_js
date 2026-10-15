@@ -5,13 +5,6 @@ This repository contains the code, results, and manuscript for the article
 Structural Equation Models: A Case Study With lavaan"** by Felipe Fontana
 Vieira and Yves Rosseel.
 
-The article sets out model-implied instrumental-variable (MIIV) estimation
-and the scaling and aggregated James–Stein estimators as
-implemented in lavaan, states the delta method standard errors for the
-James–Stein estimators, and evaluates the standard errors of all four
-estimators (JS, JSA, MIIV, ML) in a simulation study with 6 sample sizes
-× 2 reliability levels = 12 conditions, each run for 1,500 replications.
-
 <sub>The code in this repository is licensed under the [MIT License](LICENSE).
 The manuscript, figures, and other non-code content are licensed under a
 [Creative Commons Attribution 4.0 International License (CC BY 4.0)](https://creativecommons.org/licenses/by/4.0/).</sub>
@@ -71,8 +64,8 @@ nix-shell --pure --run 'Rscript simulation.R'    # → results/replications.rds
 
 `simulation.R` generates the data under the population model and fits every
 data set with the four estimators (`lavaan::sem` with `estimator = "JS"`,
-`"JSA"`, `"IV"`, and `"ML"`, all with a mean structure). It stores the
-estimates, standard errors, and confidence intervals of every free parameter
+`"JSA"`, `"IV"`, and `"ML"`). It stores the estimates, standard errors, and 
+confidence intervals of every free parameter
 other than the intercepts. One seed (`1234`) is set before the loop. The run
 takes about 55 minutes on an Apple M4 Pro with 24 GB of memory running macOS
 Sequoia 15.7.3.
@@ -120,12 +113,13 @@ package. It pins R and all R packages to the `rstats-on-nix` snapshot of
 2026-05-11, lavaan to the CRAN release 0.7-3 (the version used for the
 results), and the Quarto CLI and TeX packages needed by apaquarto. Because
 lavaan 0.7-3 is newer than the snapshot date, it is taken from the 0.7-3 tag
-of the CRAN GitHub mirror (`cran/lavaan`), which holds the exact CRAN source. The environment provides:
+of the CRAN GitHub mirror (`cran/lavaan`), which holds the exact CRAN source. 
+The environment provides:
 
 | Software   | Version    |
 |------------|------------|
 | R          | 4.6.0      |
-| lavaan     | 0.7-3 (CRAN) |
+| lavaan     | 0.7-3      |
 | simhelpers | 0.3.1      |
 | ggplot2    | 4.0.3      |
 | knitr      | 1.51       |
