@@ -1,16 +1,17 @@
-## simulation.R
-## Monte Carlo simulation for "Model-Implied Instrumental-Variable and
-## James-Stein Estimation of Structural Equation Models".
-## Generates the data and fits the four estimators in every replication.
-## Output: results/replications.rds, one row per replication, estimator, and
-## estimand (n, rel, replication, estimator, parameter, true, estimate, se,
-## ci_lower, ci_upper). Runtime is about 55 minutes on an Apple M4 Pro with
-## 24 GB of memory running macOS Sequoia 15.7.3.
+# simulation.R
+
+# monte carlo simulation code
+# generates the data and fits the four estimators in every replication.
+# output: results/replications.rds, one row per replication, estimator, and
+#  estimand (n, rel, replication, estimator, parameter, true, estimate, se,
+#  ci_lower, ci_upper).
+# runtime is about 55 minutes on an Apple M4 Pro with 24 GB of memory running
+#  macOS Sequoia 15.7.3.
 
 library(lavaan)
 set.seed(1234)
 
-## population model
+# population model
 lam <- c(1, 0.8, 1.2, 1.0, 1, 0.9, 1.1, 1.0, 1, 0.9, 1.1, 1.0)
 var_eta <- rep(1, 12)
 pop_model <- function(rel) {
@@ -28,7 +29,7 @@ pop_model <- function(rel) {
   ', paste0("y", 1:12, " ~~ ", round(theta, 4), "*y", 1:12, collapse = "; "))
 }
 
-## analysis model
+# analysis model
 mod <- '
   eta1 =~ y1 + y2 + y3 + y4
   eta2 =~ y5 + y6 + y7 + y8
@@ -37,12 +38,12 @@ mod <- '
   eta3 ~ eta1 + eta2
 '
 
-## design
+# design
 ns <- c(100, 200, 300, 400, 500, 600); rels <- c(0.6, 0.8); R <- 1500
 cond <- expand.grid(n = ns, rel = rels)
 est <- c("JS", "JSA", "IV", "ML")
 
-## one replication: generate a data set and fit it with every estimator
+# one replication: generate a data set and fit it with every estimator
 one <- function(n, rel) {
   pop <- pop_model(rel)
   pt <- lavaanify(pop)
@@ -62,7 +63,7 @@ one <- function(n, rel) {
   }))
 }
 
-## run all conditions
+# run all conditions
 res <- do.call(rbind, lapply(seq_len(nrow(cond)), function(i)
   do.call(rbind, lapply(seq_len(R), function(r) {
     out <- one(cond$n[i], cond$rel[i])
@@ -70,7 +71,7 @@ res <- do.call(rbind, lapply(seq_len(nrow(cond)), function(i)
     out
   }))))
 
-## save
+# save
 reps <- res[c("n", "rel", "replication", "estimator", "par", "true", "est",
               "se", "ci.lower", "ci.upper")]
 names(reps) <- c("n", "rel", "replication", "estimator", "parameter", "true",

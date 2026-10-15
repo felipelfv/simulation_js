@@ -1,7 +1,6 @@
 library(rix)
 
-# Reproducible environment for the MIIV / James-Stein simulation manuscript.
-# The simulation results in the manuscript were produced with the CRAN release
+# the simulation results in the manuscript were produced with the CRAN release
 # of lavaan 0.7-3 (published 2026-10-08). It is newer than the snapshot date and
 # not yet in the CRAN archive, so it is pinned to the 0.7-3 tag of the CRAN
 # GitHub mirror (cran/lavaan), which holds the exact CRAN source.

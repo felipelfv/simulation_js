@@ -1100,38 +1100,35 @@ rb_iv100 <- summ[summ$estimator == "IV" & summ$n == 100 & summ$rel == 0.6, ]
 rb_iv_load <- range(-rb_iv100$rel_bias[grepl("=~", rb_iv100$parameter)])
 rb_iv_var <- range(rb_iv100$rel_bias[grepl("^eta[0-9]~~", rb_iv100$parameter)])
 rb_300 <- max(abs(summ$rel_bias[summ$n >= 300]))
-summ$class <- ifelse(grepl("=~", summ$parameter), "Loadings",
-               ifelse(grepl("~~", summ$parameter),
-                      ifelse(grepl("^eta", summ$parameter), "Factor variances",
-                             "Residual variances"), "Structural"))
-summ$estimator <- factor(summ$estimator,
-                         levels = c("JS", "JSA", "IV", "ML"))
+summ$estimator <- factor(summ$estimator, levels = c("JS", "JSA", "IV", "ML"))
 
-## long format over the three criteria, with values above `cap` flagged
+## long format over the three criteria, with MCSE bars
 crit <- c(sd = "SD", rb_var = "SE²/VAR", coverage = "Coverage")
-mcse <- c(sd = "sd_mcse", rb_var = "rb_var_mcse", coverage = "coverage_mcse")
-cap <- 1.5
 long <- do.call(rbind, lapply(names(crit), function(k)
-  data.frame(summ[c("n", "rel", "estimator", "parameter", "class")],
-             criterion = crit[k],
-             value = summ[[k]],
-             mcse = summ[[mcse[k]]])))
+  data.frame(summ[c("n", "rel", "estimator", "parameter")],
+             criterion = crit[k], value = summ[[k]],
+             mcse = summ[[paste0(k, "_mcse")]])))
 long$criterion <- factor(long$criterion, levels = crit)
+long$rel <- factor(long$rel, levels = rels,
+                   labels = paste("Reliability", sub("^0", "", rels)))
+long$lower <- long$value - long$mcse
+long$upper <- long$value + long$mcse
+
+## SE²/VAR values above `cap` are drawn at `cap` with an open triangle and no bar
+cap <- 1.5
+i <- long$criterion == "SE²/VAR"
+long$clipped <- i & long$value > cap
+long$value[long$clipped] <- cap
+long$upper[i] <- pmin(long$upper[i], cap)
+long$lower[long$clipped] <- long$upper[long$clipped] <- NA
+
 ref <- data.frame(criterion = factor(c("SE²/VAR", "Coverage"), levels = crit),
                   y = c(1, 0.95))
-clip <- function(v) {
-  i <- v$criterion == "SE²/VAR"
-  v$clipped <- i & v$value > cap
-  v$value[v$clipped] <- cap
-  if ("upper" %in% names(v)) {
-    v$upper[i] <- pmin(v$upper[i], cap)
-    v$lower[i] <- pmin(v$lower[i], cap)
-    v$lower[v$clipped] <- v$upper[v$clipped] <- NA
-  }
-  v
-}
 pd <- position_dodge(width = 25)
-plot_perf <- function(v, col, labeller = "label_value", breaks = ns) {
+
+plot_params <- function(pars, labels, breaks = ns) {
+  v <- long[long$parameter %in% pars, ]
+  v$parameter <- factor(v$parameter, levels = pars, labels = labels)
   ggplot(v, aes(n, value, colour = estimator, shape = estimator,
                 linetype = estimator)) +
     geom_hline(data = ref, aes(yintercept = y), colour = "grey55",
@@ -1142,8 +1139,8 @@ plot_perf <- function(v, col, labeller = "label_value", breaks = ns) {
     geom_point(size = 2, position = pd) +
     geom_point(data = v[v$clipped, ], shape = 2, size = 3, position = pd,
                show.legend = FALSE) +
-    facet_grid(as.formula(paste("rel + criterion ~", col)),
-               scales = "free_y", switch = "y", labeller = labeller) +
+    facet_grid(rel + criterion ~ parameter, scales = "free_y", switch = "y",
+               labeller = labeller(parameter = label_parsed)) +
     scale_x_continuous(breaks = breaks) +
     scale_colour_manual(values = c(JS = "#2a78d6", JSA = "#eda100",
                                    IV = "#eb6834", ML = "#1baf7a")) +
@@ -1157,15 +1154,6 @@ plot_perf <- function(v, col, labeller = "label_value", breaks = ns) {
           strip.text.y.left = element_text(angle = 90),
           panel.grid.minor = element_blank(),
           panel.border = element_rect(fill = NA, colour = "grey80"))
-}
-plot_params <- function(pars, labels, breaks = ns) {
-  v <- long[long$parameter %in% pars, ]
-  v$parameter <- factor(v$parameter, levels = pars, labels = labels)
-  v$rel <- factor(v$rel, levels = rels,
-                  labels = paste("Reliability", sub("^0", "", rels)))
-  v$lower <- v$value - v$mcse; v$upper <- v$value + v$mcse
-  plot_perf(clip(v), "parameter",
-            labeller = labeller(parameter = label_parsed), breaks = breaks)
 }
 pars_coef <- c("eta2~eta1", "eta3~eta1", "eta3~eta2")
 lab_coef  <- c("B[21]", "B[31]", "B[32]")
