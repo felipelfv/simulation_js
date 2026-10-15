@@ -48,9 +48,11 @@ author-note:
     conflict-of-interest: "The authors report there are no competing interests
     to declare. Generative AI (Claude Opus 5.5, Anthropic) was used to create
     all figures, with the TikZ and R code based on earlier files written by the
-    first author, and to improve the flow of the Introduction and Discussion. 
-    All AI output and suggestions were checked by the first author, and the
-    authors take full responsibility for the content of this article."
+    first author, and to improve the flow of the Introduction, Results, and 
+    Discussion. Commits containing AI generated code or text are marked as such
+    in the commit history of the project repository. All AI output and 
+    suggestions were checked by the first author, and the authors take full 
+    responsibility for the content of this article."
     financial-support: "This project was funded by the Special Research Fund
     (BOF) of Ghent University (BOF/24J/2023/144)."
     gratitude: ~
@@ -1284,8 +1286,8 @@ plot_params(pars_fvar, lab_fvar)
 
 # Discussion
 
-This article described MIIV, JS, and JSA estimation as currently implemented
-in the R package lavaan and developed and illustrated analytical standard
+This article described MIIV, JS, and JSA estimation as currently implemented in 
+the R package lavaan. It also developed and illustrated analytical standard 
 errors for JS and JSA. A reproducible simulation study evaluated their
 standard error accuracy against ML under correct model specification.
 
