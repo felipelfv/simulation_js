@@ -1051,10 +1051,13 @@ of the SE$^2$/VAR ratio are obtained by jackknife and that of coverage in
 closed form. The SE/SD ratio and the SE$^2$/VAR ratio compare the same
 quantities on the standard deviation and on the variance scale, so only
 the latter, for which an MCSE is available, is shown in the figures.
+Coverage between .925 and .975 and SE$^2$/VAR ratios between 0.90 and 1.10
+were considered acceptable.
+
 Although the evaluation targets the standard errors, the relative bias of
 the estimates was also computed, because standard errors of markedly
 biased estimates are of limited use for inference. It is reported in the
-text but not in the figures.
+text, but not in the figures.
 
 ```{r}
 #| label: tbl-performance
@@ -1200,35 +1203,44 @@ half. @fig-sim-structural shows the latent regression slopes,
 @fig-sim-loadings one loading per latent variable, @fig-sim-residual the
 residual variances of the scaling indicators and one nonscaling indicator per
 latent variable, and @fig-sim-factorvar the variance of $\eta_1$ and the two
-disturbance variances. Omitted loadings and residual variances behave similarly to those shown for the same latent variable, with SE$^2$/VAR ratios that differ by at most 0.15 and coverage by .03 in every condition.
+disturbance variances. Omitted loadings and residual variances behave similarly 
+to those shown for the same latent variable, with SE$^2$/VAR ratios that differ 
+by at most 0.15 and coverage by .03 in every condition.
 
-From $n=300$ onward, standard error performance is similar across estimators
-within Monte Carlo uncertainty. For every parameter and both reliability
-levels, SE$^2$/VAR ratios remain within 0.12 of one and coverage within .035
-of .95, with similar patterns across sample sizes. Three differences emerge at
-$n=100$ and $n=200$, mainly at reliability .6.
+Overall, standard error performance was acceptable. Across all conditions,
+estimators, and parameters, `r sprintf("%.1f", 100 * mean(summ$coverage >=.925 & summ$coverage <= .975))`% 
+of coverage rates fell between .925 and .975
+and `r sprintf("%.1f", 100 * mean(summ$rb_var >= .90 & summ$rb_var <= 1.10))`%
+of SE$^2$/VAR ratios between 0.90 and 1.10, with no ratio below 0.90. From
+$n=300$ onward, the few ratios above 1.10 remained below 1.12. Three
+departures emerge at $n=100$ and $n=200$, mainly at reliability .6.
 
-First, JS overestimates the standard errors of $B_{31}$ and $B_{32}$ at
-reliability .6. SE$^2$/VAR ratios reach 1.5–1.6 at $n=100$ and 1.13–1.14 at
-$n=200$, with coverage of .96–.98. Its SD is also the largest, 0.24 versus 0.13–0.17 at $n=100$. These patterns may reflect instability in the
-reliability adjustment for the $\eta_3$ equation. In some replications, the implied correlation between $\eta_1$ and $\eta_2$ approaches one, making the
-fitted predictors nearly collinear and inflating both estimates and standard
-errors. Screening removed the most extreme cases, but milder cases remain.
-JSA, which aggregates indicators within each latent variable, shows no
-corresponding instability.
+First, JS standard errors for $B_{31}$ and $B_{32}$ exceed the acceptable
+range at reliability .6, with SE$^2$/VAR ratios of 1.5–1.6 at $n=100$ and
+1.13–1.14 at $n=200$. Coverage nonetheless exceeds .975 only for $B_{31}$ at
+$n=100$. Its SD is also the largest, 0.24 versus 0.13–0.17 at $n=100$. These
+patterns may reflect instability in the reliability adjustment for the
+$\eta_3$ equation. In some replications, the implied correlation between
+$\eta_1$ and $\eta_2$ approaches 1, making the fitted predictors nearly
+collinear and inflating both estimates and standard errors. Screening removed
+the most extreme cases, but milder cases remain. JSA, which aggregates
+indicators within each latent variable, shows no corresponding instability.
 
-Second, MIIV loading intervals undercover at reliability .6, with coverage of .88–.90 at $n=100$, compared with .93–.96 for the other estimators, despite
-SE$^2$/VAR ratios of 0.98–1.14 and the smallest SD. This discrepancy reflects
-the downward loading bias reported above, consistent with the weak instrument
-effect described by @jin_etall_2021, and diminishes slowly as sample size
-increases.
+Second, MIIV loading intervals fall below the acceptable coverage range at
+reliability .6, with coverage of .88–.90 at $n=100$, compared with .93–.96 for
+the other estimators, despite SE$^2$/VAR ratios of 0.98–1.14 and the smallest
+SD. This discrepancy reflects the downward loading bias reported above,
+consistent with the weak instrument effect described by @jin_etall_2021, and
+diminishes slowly as sample size increases.
 
-Third, disturbance variance coverage differs at $n=100$. ML undercovers at
-.91–.94 despite SE$^2$/VAR ratios close to one, whereas MIIV overcovers at
-.96–.97, with ratios of 1.11–1.18. JS and JSA fall between them. At
-reliability .8, ML, JS, and JSA all undercover the disturbance variance of
-$\eta_2$, with coverage of .92. Residual variances show less contrast, with coverage from .91 to .96 across estimators, with a common dip at
-$n=100$.
+Third, at $n=100$ MIIV overestimates the standard errors of the latent and
+disturbance variances, with ratios of 1.11–1.18, but its coverage rates of
+.96–.97 remain within the acceptable range. ML, in contrast, has ratios close
+to 1 but coverage rates of .91–.94 for the disturbance variances. JS and JSA
+fall between them. At reliability .8, the coverage rate for the disturbance
+variance of $\eta_2$ is about .92 for ML, JS, and JSA, just below the
+acceptable range. Residual variances show less contrast, with coverage rates
+from .91 to .96 across estimators and a common dip at $n=100$.
 
 ```{r}
 #| label: fig-sim-structural
