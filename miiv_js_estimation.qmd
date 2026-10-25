@@ -58,20 +58,21 @@ author-note:
     gratitude: ~
 
 abstract: |
-  This article presents model-implied instrumental-variable
-  (MIIV) estimation and scaling (JS) and aggregated (JSA) James–Stein
-  estimation within a common notation, based on their implementation in the R 
-  package lavaan. We describe the estimation of factor loadings and latent 
-  regression slopes equation by equation, followed by the estimation of variance,
-  covariance, and intercept parameters. We also provide analytical standard 
-  errors for JS and JSA using the delta method, accounting for
-  uncertainty across all estimation stages. A simulation study compares the 
-  standard error accuracy of these approaches 
-  with maximum likelihood (ML) under correct model specification. The standard 
-  errors of MIIV, JS, and JSA perform comparably to those of ML under the 
-  conditions examined. 
+  This article presents scaling (JS) and aggregated (JSA) James–Stein
+  estimation of structural equation models, based on their implementation in
+  the R package lavaan. Starting from a worked example, we describe the
+  estimation of factor loadings and latent regression slopes equation by
+  equation, followed by the estimation of variance, covariance, and intercept
+  parameters. We also provide analytical standard errors for JS and JSA using
+  the delta method, accounting for uncertainty across all estimation stages.
+  Throughout, model-implied instrumental-variable (MIIV) estimation serves as
+  a point of comparison within a common notation. A simulation study compares
+  the standard error accuracy of JS and JSA with that of MIIV and maximum
+  likelihood (ML) under correct model specification. The standard errors of
+  JS and JSA perform comparably to those of MIIV and ML under the conditions
+  examined.
 
-keywords: [structural equation modeling, model-implied instrumental variables, James–Stein estimation, delta method, simulation]
+keywords: [structural equation modeling, James–Stein estimation, model-implied instrumental variables, delta method, simulation]
 
 language:
   title-impact-statement: "Translational Abstract"
@@ -121,67 +122,78 @@ library(knitr)
 
 Structural equation models (SEMs) with latent variables are usually estimated
 by maximum likelihood (ML), which estimates all parameters jointly. Although
-ML has desirable asymptotic properties when its assumptions hold,
-difficulties can arise when it is applied in practice. For instance, a 
+ML has desirable asymptotic properties when its assumptions hold
+[@browne_1984], difficulties can arise when it is applied in practice. For instance, a 
 misspecification in one equation can
 bias estimates in other equations [@kaplan_1988; @bollen_etall_2007;
 @bollen_2018; @dhaene_rosseel_2023; see also @jin_etall_2021, for diagonally
 weighted least squares], and the iterative optimization can fail to converge
 or end in inadmissible solutions, especially in small samples [@bollen_2018;
 @dhaene_rosseel_2023]. Equation-by-equation estimators offer an alternative
-[e.g., @bollen_1996; @burghgraeve_etall_2021]. In the approaches considered,
+[e.g., @bollen_1996; @burghgraeve_etall_2021]. With these approaches,
 factor loadings and latent regression slopes are estimated one equation at a
 time and in closed form, which may limit the propagation of misspecification
 across equations [@bollen_gates_fisher_2018; @burghgraeve_etall_2021] and
-avoids iterative optimization for this part of the estimation. Two such 
-estimators are considered. Model-implied
-instrumental-variable (MIIV) estimation replaces each latent variable by a
-scaling indicator and uses instruments implied by the model to correct for the
-resulting measurement error [@bollen_1996; @bollen_bauer_2004; @bollen_2018].
-James–Stein estimation, proposed for SEMs by @burghgraeve_etall_2021, instead
-replaces each latent predictor by an estimate of its conditional expectation
-given observed proxies and then applies least squares. This conditional
-expectation is estimated using James–Stein type shrinkage [@james_stein_1961;
-@efron_morris_1973; @efron_morris_1975]. The approach follows the principle of
-regression calibration in errors-in-variables regression [@fuller_1987;
-@whittemore_1989; @carroll_etall_2006]. Its scaling version (JS) uses the
-scaling indicators as proxies, and its aggregated version (JSA) uses
-reliability weighted sums of indicators. JSA was found to outperform ML and
-MIIV in terms of mean squared error under the small sample conditions
-examined [@burghgraeve_etall_2021]. Both versions were further evaluated for
-confirmatory factor models by @dhaene_rosseel_2024.
+avoids iterative optimization for this part of the estimation.
 
-Beyond point estimation, the usefulness of these approaches for statistical
-inference depends on the accuracy of their standard errors. For MIIV,
-conventional standard errors for factor loadings and latent regression slopes
-follow from two-stage least squares [@bollen_1996]. Standard errors for these
-same estimates can also be obtained by the delta method, using derivatives
-with respect to the sample moments, for which @fisher_bollen_2020 provided
-explicit analytical expressions. These derivatives also propagate uncertainty
-in the estimated loadings and slopes into the standard errors of subsequently
-estimated variance and covariance parameters. Standard errors for these latter
-parameters were derived under unweighted least squares by
+This article focuses on James–Stein estimation, an equation-by-equation
+estimator proposed for SEMs with latent variables in
+@burghgraeve_etall_2021, which replaces each latent predictor by an estimate
+of its conditional expectation given observed proxies and then applies
+least squares. This conditional expectation is estimated using
+James–Stein type shrinkage [@james_stein_1961; @efron_morris_1973;
+@efron_morris_1975], and the approach follows the principle of regression
+calibration in errors-in-variables regression [@fuller_1987;
+@whittemore_1989; @carroll_etall_2006]. James–Stein estimation comes in a
+scaling version (JS), which uses the scaling indicators as proxies, and an
+aggregated version (JSA), which uses reliability weighted sums of
+indicators. JSA was found to outperform ML and
+model-implied instrumental-variable (MIIV) estimation in terms of mean
+squared error under the small sample conditions examined
+[@burghgraeve_etall_2021], and both versions were further evaluated for
+confirmatory factor models by @dhaene_rosseel_2024. Moreover, throughout this 
+article, we also use MIIV estimation as a point of comparison. MIIV is one of
+the more widely known equation-by-equation estimators for SEMs and also
+replaces each latent variable by a scaling indicator, but corrects for the
+resulting measurement error with instruments implied by the model rather
+than with an estimated reliability adjustment [@bollen_1996;
+@bollen_bauer_2004; @bollen_2018]. Placing the two side by side makes clear what James–Stein 
+estimation shares with MIIV and where it departs from it.
+
+Beyond point estimation, the usefulness of James–Stein estimation for
+statistical inference depends on the accuracy of its standard errors.
+@burghgraeve_etall_2021 derived a sampling variance expression for latent
+regression estimates that accounts for uncertainty in the estimated
+reliability adjustment, providing a basis for analytical standard errors for
+those estimates. However, they did not develop a complete analytical
+standard error calculation for all model parameters and used bootstrap
+standard errors for both JS and JSA in their empirical evaluations. For
+MIIV, by contrast, standard errors are well established. Conventional
+standard errors for factor loadings and latent regression slopes follow from
+two-stage least squares [@bollen_1996]. Standard errors for these same
+estimates can also be obtained by the delta method, using derivatives with
+respect to the sample moments, for which @fisher_bollen_2020 provided
+explicit analytical expressions. These derivatives also propagate
+uncertainty in the estimated loadings and slopes into the standard errors of
+subsequently estimated variance and covariance parameters. Standard errors
+for these latter parameters were derived under unweighted least squares by
 @bollen_maydeuolivares_2007 and extended to general weight matrices by
-@jin_etall_2021. More recently, @maydeuolivares_etall_2026 compared subsequent
-variance and covariance estimation procedures and the accuracy of their
-standard errors. For James–Stein estimation, @burghgraeve_etall_2021 derived a 
-sampling variance expression for latent regression estimates that accounts for
-uncertainty in the estimated reliability adjustment, providing a basis for
-analytical standard errors for those estimates. However, they did not develop
-a complete analytical standard error calculation for all model parameters and
-used bootstrap standard errors for both JS and JSA in their empirical
-evaluations. 
-The R package lavaan [@rosseel_2012] now provides analytical standard errors for 
-both estimators by applying the delta method to the complete estimation 
-procedure. In addition, its JS and JSA implementations, initially restricted
-to confirmatory factor models, have been extended to more general models, and
-the package also includes MIIV estimation.
+@jin_etall_2021. More recently, @maydeuolivares_etall_2026 compared
+subsequent variance and covariance estimation procedures and the accuracy of
+their standard errors. The R package lavaan [@rosseel_2012] now provides
+analytical standard errors for JS and JSA by applying the delta method to
+the complete estimation procedure. In addition, its JS and JSA
+implementations, initially restricted to confirmatory factor models, have
+been extended to more general models, and the package also includes MIIV
+estimation.
 
 ## Present Study and Contributions
 
-This article makes three minor contributions. First, it describes and
-conceptually compares MIIV and James–Stein estimation within a common
-notation, following their implementation in lavaan. Second, it develops and
+This article makes three minor contributions. First, it describes
+James–Stein estimation, as implemented in lavaan, and conceptually compares
+it with MIIV estimation within a common notation, starting from a worked
+example in which the two estimators are applied to the same equation.
+Second, it develops and
 illustrates a complete delta method calculation of standard errors for JS
 and JSA, accounting for uncertainty
 across all estimation stages. Third, it evaluates their standard error
