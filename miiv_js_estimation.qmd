@@ -1,5 +1,5 @@
 ---
-title: "Model-Implied Instrumental-Variable and James–Stein Estimation of Structural Equation Models: A Case Study With lavaan"
+title: "James–Stein Estimation of Structural Equation Models With Latent Variables: A Case Study With lavaan"
 shorttitle: "MIIV and James–Stein Estimation"
 
 author:
@@ -59,12 +59,13 @@ author-note:
 
 abstract: |
   This article presents scaling (JS) and aggregated (JSA) James–Stein
-  estimation of structural equation models, based on their implementation in
-  the R package lavaan. Starting from a worked example, we describe the
-  estimation of factor loadings and latent regression slopes equation by
-  equation, followed by the estimation of variance, covariance, and intercept
-  parameters. We also provide analytical standard errors for JS and JSA using
-  the delta method, accounting for uncertainty across all estimation stages.
+  estimation of structural equation models with latent variables, based on 
+  their implementation in the R package lavaan. Starting from a worked example, 
+  we describe the estimation of factor loadings and latent regression slopes 
+  equation by equation, followed by the estimation of variance, covariance, 
+  and intercept parameters. We also provide analytical standard errors for 
+  JS and JSA using the delta method, accounting for uncertainty across all 
+  estimation stages, which were not available before. 
   Throughout, model-implied instrumental-variable (MIIV) estimation serves as
   a point of comparison within a common notation. A simulation study compares
   the standard error accuracy of JS and JSA with that of MIIV and maximum
@@ -103,6 +104,8 @@ format:
         \newtheorem{lsamcorollary}{Corollary}
         \theoremstyle{definition}
         \newtheorem{lsamremark}{Remark}
+        \newtheoremstyle{lsamexample}{\topsep}{\topsep}{}{}{\bfseries}{}{ }{\thmname{#1}\thmnumber{ #2}.\thmnote{ {\normalfont\itshape(#3)}}}
+        \theoremstyle{lsamexample}
         \newtheorem{lsamexample}{Example}
 
 execute:
@@ -123,8 +126,8 @@ library(knitr)
 Structural equation models (SEMs) with latent variables are usually estimated
 by maximum likelihood (ML), which estimates all parameters jointly. Although
 ML has desirable asymptotic properties when its assumptions hold
-[@browne_1984], difficulties can arise when it is applied in practice. For instance, a 
-misspecification in one equation can
+[e.g, @browne_1984], difficulties may arise when it is applied in practice. 
+For instance, a misspecification in one equation can
 bias estimates in other equations [@kaplan_1988; @bollen_etall_2007;
 @bollen_2018; @dhaene_rosseel_2023; see also @jin_etall_2021, for diagonally
 weighted least squares], and the iterative optimization can fail to converge
@@ -147,21 +150,26 @@ calibration in errors-in-variables regression [@fuller_1987;
 @whittemore_1989; @carroll_etall_2006]. James–Stein estimation comes in a
 scaling version (JS), which uses the scaling indicators as proxies, and an
 aggregated version (JSA), which uses reliability weighted sums of
-indicators. JSA was found to outperform ML and
-model-implied instrumental-variable (MIIV) estimation in terms of mean
-squared error under the small sample conditions examined
-[@burghgraeve_etall_2021], and both versions were further evaluated for
-confirmatory factor models by @dhaene_rosseel_2024. Moreover, throughout this 
-article, we also use MIIV estimation as a point of comparison. MIIV is one of
-the more widely known equation-by-equation estimators for SEMs and also
-replaces each latent variable by a scaling indicator, but corrects for the
-resulting measurement error with instruments implied by the model rather
-than with an estimated reliability adjustment [@bollen_1996;
-@bollen_bauer_2004; @bollen_2018]. Placing the two side by side makes clear what James–Stein 
-estimation shares with MIIV and where it departs from it.
+indicators. Throughout this article, we also use model-implied
+instrumental-variable (MIIV) estimation^[Throughout this article, MIIV
+refers to model-implied instrumental-variable two-stage least squares
+(MIIV-2SLS) estimation [@bollen_1996; @bollen_2018]. Other estimators use
+the same model-implied instruments, such as MIIV-GMM
+[@bollen_kolenikov_bauldry_2014], which can estimate several equations
+jointly, but these are not considered here.] as a point of comparison.
+MIIV is one of the more widely known equation-by-equation estimators for
+SEMs and also replaces each latent variable by a scaling indicator, but
+corrects for the resulting measurement error with instruments implied by
+the model rather than with an estimated reliability adjustment
+[@bollen_1996; @bollen_bauer_2004; @bollen_2018]. JSA was found to
+outperform ML and MIIV in terms of mean squared error under the small
+sample conditions examined [@burghgraeve_etall_2021], and both versions
+were further evaluated for confirmatory factor models by
+@dhaene_rosseel_2024. Placing the two side by side makes clear what JS and
+JSA share with MIIV and where they depart from it.
 
-Beyond point estimation, the usefulness of James–Stein estimation for
-statistical inference depends on the accuracy of its standard errors.
+Beyond point estimation, the usefulness of JS and JSA for statistical
+inference depends on the accuracy of their standard errors.
 @burghgraeve_etall_2021 derived a sampling variance expression for latent
 regression estimates that accounts for uncertainty in the estimated
 reliability adjustment, providing a basis for analytical standard errors for
@@ -180,36 +188,40 @@ for these latter parameters were derived under unweighted least squares by
 @bollen_maydeuolivares_2007 and extended to general weight matrices by
 @jin_etall_2021. More recently, @maydeuolivares_etall_2026 compared
 subsequent variance and covariance estimation procedures and the accuracy of
-their standard errors. The R package lavaan [@rosseel_2012] now provides
-analytical standard errors for JS and JSA by applying the delta method to
-the complete estimation procedure. In addition, its JS and JSA
-implementations, initially restricted to confirmatory factor models, have
-been extended to more general models, and the package also includes MIIV
-estimation.
+their standard errors.
+
+For JS and JSA, this gap has recently been closed in software. The R
+package lavaan [@rosseel_2012] now provides analytical standard errors for
+both by applying the delta method to the complete estimation procedure. In
+addition, its JS and JSA implementations, initially restricted to
+confirmatory factor models, have been extended to more general models, and
+the package also includes MIIV estimation. Yet neither these analytical
+standard errors nor the extended implementations have been systematically
+evaluated.
 
 ## Present Study and Contributions
 
 This article makes three minor contributions. First, it describes
-James–Stein estimation, as implemented in lavaan, and conceptually compares
-it with MIIV estimation within a common notation, starting from a worked
-example in which the two estimators are applied to the same equation.
-Second, it develops and
+JS and JSA, as implemented in lavaan, and conceptually compares them with
+MIIV estimation within a common notation, starting from a worked
+example. Second, it develops and
 illustrates a complete delta method calculation of standard errors for JS
 and JSA, accounting for uncertainty
 across all estimation stages. Third, it evaluates their standard error
 accuracy in a simulation study comparing JS and JSA with MIIV and ML.
 
-The remainder of the article introduces the model and notation, describes the
-estimation of factor loadings, latent regression slopes, and the remaining
-parameters, presents the analytical standard errors, and reports the
-simulation study.
+The remainder of the article introduces the model and notation, presents
+the estimators for all parameters together with their analytical standard
+errors, and reports the simulation study and its results, followed by a
+discussion.
 
 # Model, Notation, and Parameterization
 
 Following the all-y LISREL notation [@joreskog_sorbom_1996, submodel 3B,
 Chapter 6; @rosseel_vidal_2025], let $\mathbf y\in\mathbb R^p$ contain the
 continuous observed variables and $\boldsymbol\eta\in\mathbb R^q$ the latent
-variables. The measurement and latent variable models are
+variables. The measurement and latent variable (or structural) models are 
+respectively
 
 $$
 \mathbf y
@@ -230,8 +242,8 @@ that is, the regression slopes among the latent variables. The measurement
 errors $\boldsymbol\epsilon\in\mathbb R^p$ and structural disturbances
 $\boldsymbol\zeta\in\mathbb R^q$ satisfy
 $E(\boldsymbol\epsilon)=\mathbf0$ and $E(\boldsymbol\zeta)=\mathbf0$.
-Let $\mathbb S_+^k$ and $\mathbb S_{++}^k$ denote the sets of symmetric
-positive semidefinite and positive definite $k\times k$ matrices,
+Let $\mathbb S_+^m$ and $\mathbb S_{++}^m$ denote the sets of symmetric
+positive semidefinite and positive definite $m\times m$ matrices,
 respectively. Assume
 
 $$
@@ -247,7 +259,6 @@ $$
 =
 \mathbf0_{p\times q}.
 $$
-
 Provided that $\mathbf I_q-\mathbf B$ is nonsingular, the latent and
 observed mean vectors are
 
@@ -274,16 +285,14 @@ $$
 \boldsymbol\Lambda^\top
 +
 \boldsymbol\Theta.
-$$
+$$ {#eq-implied-covariance}
 
 Let $\boldsymbol\theta\in\mathbb R^d$ collect the free parameters. Assume that $\boldsymbol\Sigma(\boldsymbol\theta)\in\mathbb S_{++}^p$. Denote
 the sample mean vector and covariance matrix by
 $\overline{\mathbf y}\in\mathbb R^p$ and $\mathbf S\in\mathbb S_+^p$,
 respectively, computed from a single group of independent and identically
 distributed observations $\mathbf y_i$, $i=1,\ldots,n$, of $\mathbf y$,
-which is the setting of all estimation expressions below.^[Following
-lavaan, $\mathbf S$ uses the divisor $n$ for JS and JSA and $n-1$ for MIIV
-estimation.] Define
+which is the setting of all estimation expressions below. Define
 
 $$
 \mathbf s
@@ -305,37 +314,31 @@ $$
 h=p+\frac{p(p+1)}2,
 $$
 where $\operatorname{vech}$ stacks the lower triangular entries, including
-the diagonal.
+the diagonal. A common choice for estimating $\boldsymbol\theta$ jointly is 
+ML, which requires further distributional assumptions
+[@browne_1974; @shapiro_2007; see @bollen_2026, Chapter 4, pp. 201--203,
+Chapter 5, pp. 352--353, for an overview]. JS, JSA, and MIIV proceed
+differently. They first estimate the factor loadings and latent regression
+slopes equation by equation, and then the remaining parameters conditional
+on these estimates.
 
 # Estimation of Factor Loadings and Latent Regression Slopes
 
-JS, JSA, and MIIV estimate factor loadings and latent regression slopes
-equation by equation, under a scaling indicator parameterization
-[@bollen_1996; @bollen_2018; @burghgraeve_etall_2021], in which one loading
-per latent variable, that of its scaling indicator, is fixed to one and the
-corresponding intercept is fixed to zero [@bollen_1989]. These estimates are obtained from centered observations,
-with intercepts estimated subsequently. The following example
-illustrates how JS and MIIV address measurement error in an observed
-predictor.
+We use a scaling indicator parameterization
+[@bollen_1996; @bollen_2018; @burghgraeve_etall_2021], fixing one loading
+per latent variable to one and the corresponding intercept to zero
+[@bollen_1989]. Each scaling indicator is assumed to load only on its
+corresponding latent variable. The loadings and slopes are obtained from
+centered observations, with intercepts estimated subsequently. The
+following example illustrates how JS and MIIV address measurement error in
+a scaling indicator used as predictor.
 
-\begin{lsamexample}\label{ex:loading}
-Consider four indicators of $\eta_1$, with $y_1$ as its scaling indicator:
-$$
-y_1=\eta_1+\epsilon_1,
-\qquad
-y_r=\nu_r+\lambda_r\eta_1+\epsilon_r,
-\quad r=2,3,4.
-$$
-Assume
-$$
-E(\epsilon_r)=0,
-\qquad
-\operatorname{Cov}(\eta_1,\epsilon_r)=0,
-\qquad
-\operatorname{Cov}(\epsilon_r,\epsilon_s)=0
-\quad(r\ne s).
-$$
-The objective is to estimate $\lambda_2$. Writing
+\begin{lsamexample}[A factor loading and a latent regression slope].\label{ex:loading}
+Consider four indicators of $\eta_1$, with $y_1$ as its scaling indicator,
+so that $y_1=\eta_1+\epsilon_1$ and $y_r=\nu_r+\lambda_r\eta_1+\epsilon_r$
+for $r=2,3,4$. Assume $E(\epsilon_r)=0$,
+$\operatorname{Cov}(\eta_1,\epsilon_r)=0$, and
+$\operatorname{Cov}(\epsilon_r,\epsilon_s)=0$ for $r\ne s$. The objective is to estimate $\lambda_2$. Writing
 $\psi=\operatorname{Var}(\eta_1)$ and
 $\omega_1=\operatorname{Var}(\epsilon_1)$, the population slope from
 regressing $y_2$ directly on $y_1$ is
@@ -345,10 +348,9 @@ $$
 =
 \lambda_2\frac{\psi}{\psi+\omega_1}.
 $$
-Thus, measurement error in $y_1$ attenuates the slope.
-
-JS estimates the latent predictor from its scaling indicator. Under joint
-normality,
+Thus, measurement error in $y_1$ attenuates the slope. JS estimates the
+latent predictor from its scaling indicator. Under joint normality, it can be 
+shown that 
 $$
 E(\eta_1\mid y_1)
 =
@@ -356,16 +358,11 @@ E(\eta_1\mid y_1)
 \qquad
 R=\frac{\psi}{\psi+\omega_1},
 $$
-where $\mu_1=E(\eta_1)=E(y_1)$. The other indicators provide information
-about $\omega_1$, because
-$$
-\operatorname{Cov}(y_1,y_3)=\lambda_3\psi,
-\qquad
-\operatorname{Cov}(y_1,y_4)=\lambda_4\psi,
-\qquad
-\operatorname{Cov}(y_3,y_4)=\lambda_3\lambda_4\psi.
-$$
-Consequently,
+where $\mu_1=E(\eta_1)=E(y_1)$ (Burghgraeve et al., 2021). The other indicators 
+provide information about $\omega_1$, because
+$\operatorname{Cov}(y_1,y_3)=\lambda_3\psi$,
+$\operatorname{Cov}(y_1,y_4)=\lambda_4\psi$, and
+$\operatorname{Cov}(y_3,y_4)=\lambda_3\lambda_4\psi$. Consequently,
 $$
 \psi
 =
@@ -376,12 +373,10 @@ $$
 =
 s_{11}-\frac{s_{13}s_{14}}{s_{34}},
 $$
-where $s_{rs}$ denotes a sample covariance. This illustrates the
-preliminary error variance calculation using one pair of additional
-indicators.
-
-With the small sample correction used in JS, the estimated reliability
-adjustment and fitted latent predictor are
+where $s_{rs}$ denotes a sample covariance. This is the preliminary error
+variance estimate from one pair of other indicators. With the small sample
+correction used in JS, the estimated reliability adjustment and fitted
+latent predictor are
 $$
 \widehat R
 =
@@ -403,16 +398,9 @@ $$
 $$
 
 MIIV instead substitutes $\eta_1=y_1-\epsilon_1$ into the equation for
-$y_2$:
-$$
-y_2=\nu_2+\lambda_2y_1+u,
-\qquad
-u=\epsilon_2-\lambda_2\epsilon_1.
-$$
-The explanatory variable $y_1$ correlates with the composite error,
-$$
-\operatorname{Cov}(y_1,u)=-\lambda_2\omega_1,
-$$
+$y_2$ (Bollen, 1996), giving $y_2=\nu_2+\lambda_2y_1+u$ with
+$u=\epsilon_2-\lambda_2\epsilon_1$. The explanatory variable $y_1$
+correlates with the composite error, $\operatorname{Cov}(y_1,u)=-\lambda_2\omega_1$,
 whereas $y_3$ satisfies $\operatorname{Cov}(y_3,u)=0$. It can therefore
 serve as an instrument when $\operatorname{Cov}(y_3,y_1)\ne0$, giving
 $$
@@ -428,68 +416,61 @@ With several instruments, such as $y_3$ and $y_4$, two-stage least squares
 first regresses $y_1$ on the instruments and then regresses $y_2$ on the
 fitted values, including intercepts in both regressions.
 
-For either estimator,
+The same steps apply to a latent regression slope. In the model used in
+the simulation study below, $\eta_2=\alpha_2+B_{21}\eta_1+\zeta_2$ and
+$y_5=\eta_2+\epsilon_5$. Substitution gives
+$y_5=\alpha_2+B_{21}\eta_1+\zeta_2+\epsilon_5$, which has the form of the equation for $y_2$, with $\zeta_2+\epsilon_5$
+in place of $\epsilon_2$. Because $\zeta_2$ and $\epsilon_5$ are
+uncorrelated with $\eta_1$ and with $\epsilon_1,\ldots,\epsilon_4$, the
+same calculations give
 $$
-\widehat\nu_2
+\widehat B_{21,\mathrm{JS}}
 =
-\overline y_2-\widehat\lambda_2\overline y_1.
+\frac{s_{15}}{s_{11}-c_n\widehat\omega_1},
+\qquad
+\widehat B_{21,\mathrm{MIIV}}
+=
+\frac{s_{35}}{s_{31}}.
 $$
-JS therefore adjusts the predictor using an estimated measurement error
-variance, whereas MIIV uses instruments to estimate the loading despite the
-correlation between the explanatory variable and the composite error. JSA
-follows the JS calculation using a normalized aggregate of eligible
-indicators in place of $y_1$.
+
+Moreover, for either estimator,
+$\widehat\nu_2=\overline y_2-\widehat\lambda_2\overline y_1$ and
+$\widehat\alpha_2=\overline y_5-\widehat B_{21}\overline y_1$.
+Despite not shown in this example, we note JSA follows the JS calculation 
+using a normalized aggregate of eligible indicators in place of $y_1$, 
+as described below. 
 \end{lsamexample}
 
 ## James–Stein Estimation
 
-Consider one measurement or latent variable equation. Let
-$\mathbf f\in\mathbb R^k$ collect its latent predictors and
-$\mathbf a\in\mathbb R^k$ the corresponding factor loadings or latent
-regression slopes. Let $\mathbf x\in\mathbb R^k$ contain their scaling
-indicators in the same order, and let $\mathbf e\in\mathbb R^k$ contain the
-corresponding measurement errors. The scaling indicator rows of the
-measurement model give
+We now present the general expressions behind this example. They concern
+free loadings and slopes without equality constraints. All inverses and
+ratios are assumed well defined.
+
+### Scaling James–Stein Estimation
+
+Let $\mathbf f\in\mathbb R^k$ collect the latent predictors of the
+equation to be estimated, and let $\mathbf x\in\mathbb R^k$ collect their
+scaling indicators in matching order. These are selected elements of
+$\boldsymbol\eta$ and $\mathbf y$, respectively. Because the scaling
+indicators have zero intercepts, unit loadings, and no cross loadings,
+their measurement equations reduce to
 
 $$
 \mathbf x=\mathbf f+\mathbf e,
 $$
-which generalizes $y_1=\eta_1+\epsilon_1$ in the example. Write
+where $\mathbf e\in\mathbb R^k$ contains the corresponding measurement
+errors. In the example, $f=\eta_1$, $x=y_1$, and $e=\epsilon_1$. Define
 
 $$
-\boldsymbol\mu
-=
-E(\mathbf f)=E(\mathbf x)\in\mathbb R^k,
+\boldsymbol\mu=E(\mathbf f)=E(\mathbf x)\in\mathbb R^k,
 \qquad
-\boldsymbol\Sigma_x
-=
-\operatorname{Var}(\mathbf x)\in\mathbb S_{++}^k,
+\boldsymbol\Sigma_x=\operatorname{Var}(\mathbf x)\in\mathbb S_{++}^k,
 \qquad
-\boldsymbol\Omega
-=
-\operatorname{Var}(\mathbf e)\in\mathbb S_+^k.
+\boldsymbol\Omega=\operatorname{Var}(\mathbf e)\in\mathbb S_+^k.
 $$
-
-The observed dependent variable is the indicator being modeled in a
-measurement equation, such as $y_2$ in the example. For a latent variable
-equation, the dependent latent variable is replaced by its scaling
-indicator. Its error then contains both the structural disturbance and that
-scaling indicator's measurement error. Denote the resulting equation error
-by $\varepsilon$.
-
-The JS procedures considered use proxies that load only on their respective
-latent predictors and have mutually uncorrelated measurement errors, so
-$\boldsymbol\Omega$ is diagonal. The required orthogonality conditions are
-
-$$
-\operatorname{Cov}(\mathbf f,\mathbf e)=\mathbf0,
-\qquad
-\operatorname{Cov}(\mathbf f,\varepsilon)=\mathbf0,
-\qquad
-\operatorname{Cov}(\mathbf e,\varepsilon)=\mathbf0.
-$$
-
-Under joint normality,
+Assume diagonal $\boldsymbol\Omega$ and
+$\operatorname{Cov}(\mathbf f,\mathbf e)=\mathbf0$. Under joint normality,
 
 $$
 E(\mathbf f\mid\mathbf x)
@@ -498,19 +479,29 @@ E(\mathbf f\mid\mathbf x)
 \qquad
 \mathbf R
 =
-(\boldsymbol\Sigma_x-\boldsymbol\Omega)
-\boldsymbol\Sigma_x^{-1}
+(\boldsymbol\Sigma_x-\boldsymbol\Omega)\boldsymbol\Sigma_x^{-1}
 \in\mathbb R^{k\times k}.
+$$ {#eq-conditional-expectation}
+Otherwise, @eq-conditional-expectation gives the best linear predictor [@burghgraeve_etall_2021].
+The preliminary error variance calculation illustrated in the example
+generalizes to
+
 $$
+\widehat\omega_j
+=
+s_{jj}-\frac{s_{js}s_{jt}}{s_{st}},
+$$
+for three distinct indicators $y_j,y_s,y_t$ loading only on the same
+latent variable and having mutually uncorrelated measurement errors.
+Estimates are averaged over all such pairs, with bounds applied to the
+corresponding estimated communalities. The resulting
+scaling indicator error variances form diagonal
+$\widehat{\boldsymbol\Omega}\in\mathbb R^{k\times k}$ and need not equal
+the final model estimates.
 
-Without normality, this expression is the best linear predictor of
-$\mathbf f$ from $\mathbf x$. JS estimates this predictor and then applies
-least squares [@burghgraeve_etall_2021].
-
-Let $\mathbf S_x\in\mathbb S_{++}^k$ contain the sample covariances of the
-proxies and $\widehat{\boldsymbol\Omega}\in\mathbb R^{k\times k}$ be the
-diagonal matrix of preliminary measurement error variance estimates. The
-estimated reliability adjustment and fitted latent predictors are
+Using the sample covariance matrix $\mathbf S_x\in\mathbb S_{++}^k$ of the
+proxies $\mathbf x$, the estimated reliability adjustment and fitted
+predictors are
 
 $$
 \widehat{\mathbf R}
@@ -519,83 +510,48 @@ $$
 \qquad
 c_n=\frac{n-3}{n-1},
 $$
+and
+$\widetilde{\mathbf f}=\overline{\mathbf x}+\widehat{\mathbf R}(\mathbf x-\overline{\mathbf x})$.
 
-$$
-\widetilde{\mathbf f}
-=
-\overline{\mathbf x}
-+
-\widehat{\mathbf R}(\mathbf x-\overline{\mathbf x}).
-$$
-
-Let $\mathbf X\in\mathbb R^{n\times k}$ contain the centered proxy
-observations and $\mathbf d\in\mathbb R^n$ the centered observations of the
-dependent variable. The centered fitted predictor matrix is
-
-$$
-\widetilde{\mathbf X}
-=
-\mathbf X\widehat{\mathbf R}^{\top}.
-$$
-
-The estimator is
-
-$$
-\widehat{\mathbf a}
-=
-(\widetilde{\mathbf X}^{\top}\widetilde{\mathbf X})^{-1}
-\widetilde{\mathbf X}^{\top}\mathbf d
-=
-(\mathbf S_x-c_n\widehat{\boldsymbol\Omega})^{-1}
-\mathbf s_{xd},
-$$
-where $\mathbf s_{xd}\in\mathbb R^k$ contains the sample covariances
-between the proxies and the dependent variable. The second expression shows
-that the fitted predictor regression is equivalent to subtracting the
-estimated measurement error contribution from the proxy covariance matrix.
-These expressions assume that $\widetilde{\mathbf X}$ has full column rank
-and that the loadings and slopes are not subject to equality constraints.
-
-### Scaling James–Stein Estimation
-
-For scaling JS, $\mathbf x$ contains the scaling indicators of the latent
-predictors. Preliminary measurement error variances are obtained from the
-covariance relationships illustrated in the example. For an indicator
-$y_r$, two other eligible indicators $y_s$ and $y_t$ of the same latent
-variable give
-
-$$
-\widehat\omega_r
-=
-s_{rr}-\frac{s_{rs}s_{rt}}{s_{st}}.
-$$
-
-When several eligible pairs are available, the corresponding estimates are
-averaged. The preliminary estimates for the scaling indicators form
-$\widehat{\boldsymbol\Omega}$, yielding
+These fitted latent predictors are then used to estimate one measurement
+model or latent variable model equation. Let $\mathbf a\in\mathbb R^k$
+contain the corresponding loadings or slopes. The response is the
+dependent indicator for a measurement model equation or the dependent
+latent variable's scaling indicator for a latent variable model equation.
+Let $\delta$ denote its error: $\epsilon_2$ for response $y_2$ and
+$\zeta_2+\epsilon_5$ for response $y_5$ in the example. Assume $\operatorname{Cov}(\mathbf f,\delta)=\mathbf0$ and
+$\operatorname{Cov}(\mathbf e,\delta)=\mathbf0$. Let $\mathbf X\in\mathbb R^{n\times k}$ contain the centered proxy
+observations, with rows $(\mathbf x_i-\overline{\mathbf x})^\top$, and let
+$\mathbf d\in\mathbb R^n$ contain the centered response observations. The centered fitted
+predictor matrix is $\widetilde{\mathbf X}=\mathbf X\widehat{\mathbf R}^{\top}$,
+giving
 
 $$
 \widehat{\mathbf a}_{\mathrm{JS}}
 =
-(\mathbf S_x-c_n\widehat{\boldsymbol\Omega})^{-1}
-\mathbf s_{xd}.
-$$
-
-These preliminary error variance estimates are used for prediction and need
-not equal the final model estimates.
+(\widetilde{\mathbf X}^{\top}\widetilde{\mathbf X})^{-1}
+\widetilde{\mathbf X}^{\top}\mathbf d
+=
+(\mathbf S_x-c_n\widehat{\boldsymbol\Omega})^{-1}\mathbf s_{xd},
+$$ {#eq-js-estimator}
+where $\mathbf s_{xd}\in\mathbb R^k$ contains the sample covariances
+between proxies and response.
 
 ### Aggregated James–Stein Estimation
 
-JSA replaces each scaling indicator by a reliability weighted aggregate of
-indicators of the same latent predictor [@burghgraeve_etall_2021]. The
-indicators must satisfy the proxy conditions above, which exclude the
-dependent indicator when estimating a measurement equation.
+JSA replaces each scaling indicator by a normalized, reliability weighted
+aggregate [@burghgraeve_etall_2021]. Eligible indicators load only on the
+corresponding latent predictor. Their measurement errors are mutually
+uncorrelated across all selected indicators and uncorrelated with
+$\delta$, excluding the dependent indicator from its own predictor
+aggregate.
 
 For each latent predictor $f$ in $\mathbf f$, let $\mathbf y_f\in\mathbb R^r$
-collect its eligible indicators, with corresponding intercepts
-$\boldsymbol\nu_f\in\mathbb R^r$ and loadings
-$\boldsymbol\lambda_f\in\mathbb R^r$. For weights $\mathbf w\in\mathbb R^r$,
-normalizing the aggregate to the latent variable's scale gives
+contain its eligible indicators, with intercepts
+$\boldsymbol\nu_f\in\mathbb R^r$, loadings
+$\boldsymbol\lambda_f\in\mathbb R^r$, and diagonal measurement error
+covariance matrix $\mathbf Q_f\in\mathbb S_+^r$. For weights
+$\mathbf w\in\mathbb R^r$,
 
 $$
 g
@@ -604,23 +560,16 @@ g
      {\mathbf w^\top\boldsymbol\lambda_f}
 =
 f+e_g,
-$$
-where $e_g$ is the aggregate's measurement error. Let
-$\mathbf Q_f\in\mathbb S_+^r$ be the diagonal covariance matrix of the
-selected indicators' measurement errors. Then
-
-$$
-\omega_g
-=
+\qquad
 \operatorname{Var}(e_g)
 =
 \frac{\mathbf w^\top\mathbf Q_f\mathbf w}
-     {(\mathbf w^\top\boldsymbol\lambda_f)^2}.
+     {(\mathbf w^\top\boldsymbol\lambda_f)^2},
 $$
-
-Let $\widehat{\mathbf Q}_f$ contain preliminary measurement error variance
-estimates and $\mathbf S_f\in\mathbb S_{++}^r$ the sample covariance matrix
-of these indicators. The weights maximize estimated reliability:
+where $e_g$ is the aggregate's measurement error. Using preliminary error
+variance estimates $\widehat{\mathbf Q}_f$ and
+sample covariance matrix $\mathbf S_f\in\mathbb S_{++}^r$, the weights
+maximize estimated reliability:
 
 $$
 \widehat{\mathbf w}
@@ -632,8 +581,7 @@ $$
      {\mathbf w^\top\mathbf S_f\mathbf w}
 \right).
 $$
-
-Using preliminary scaling JS loadings $\widehat{\boldsymbol\lambda}_f$, the
+With preliminary scaling JS loadings $\widehat{\boldsymbol\lambda}_f$, the
 centered aggregate and its estimated error variance are
 
 $$
@@ -645,74 +593,35 @@ $$
 \qquad
 \widehat\omega_g
 =
-\frac{\widehat{\mathbf w}^{\top}
-      \widehat{\mathbf Q}_f\widehat{\mathbf w}}
+\frac{\widehat{\mathbf w}^{\top}\widehat{\mathbf Q}_f\widehat{\mathbf w}}
      {(\widehat{\mathbf w}^{\top}\widehat{\boldsymbol\lambda}_f)^2},
 $$
-with nonzero normalization denominator.
+assuming a nonzero normalization denominator.
 
-Constructing one aggregate for each latent predictor gives the columns of
-$\mathbf X$, and their estimated error variances form the diagonal of
-$\widehat{\boldsymbol\Omega}$, in the same order. The aggregate covariance
-matrix and its covariances with the dependent variable replace
-$\mathbf S_x$ and $\mathbf s_{xd}$ in the preceding expressions, giving
-
-$$
-\widehat{\mathbf a}_{\mathrm{JSA}}
-=
-(\mathbf S_x-c_n\widehat{\boldsymbol\Omega})^{-1}
-\mathbf s_{xd}.
-$$
-
-Thus, JS and JSA share the estimation formula and differ in the
-construction of the proxies and their measurement error variances.
+The centered aggregates replace the columns of $\mathbf X$, and their error
+variance estimates form the diagonal of $\widehat{\boldsymbol\Omega}$, in
+matching order. Recomputing $\mathbf S_x$ and $\mathbf s_{xd}$ from these
+aggregates and applying @eq-js-estimator gives
+$\widehat{\mathbf a}_{\mathrm{JSA}}$, with the same response. JS and JSA
+share @eq-js-estimator and differ in the construction of the proxies
+and their measurement error variances [@burghgraeve_etall_2021].
 
 ## Model-Implied Instrumental-Variable Estimation
 
-MIIV uses the scaling indicator equations to replace latent variables with
-observed variables [@bollen_1996]. For the same equation considered above,
-substituting
+For MIIV, $\mathbf x$ and $\mathbf X$ again denote the scaling indicators
+and their centered observations. Substituting $\mathbf f=\mathbf x-\mathbf e$
+produces the composite error $u=\delta-\mathbf a^\top\mathbf e$. After
+centering and stacking observations [@bollen_1996],
+$\mathbf d=\mathbf X\mathbf a+\mathbf u$, where $\mathbf u\in\mathbb R^n$
+contains the centered composite errors.
 
-$$
-\mathbf f=\mathbf x-\mathbf e
-$$
-produces an equation with the scaling indicators as explanatory variables
-and composite error
-
-$$
-u=\varepsilon-\mathbf a^\top\mathbf e.
-$$
-
-The explanatory variables generally correlate with the composite error
-because both contain the scaling indicator measurement errors.
-
-After centering and stacking observations, the transformed equation is
-
-$$
-\mathbf d=\mathbf X\mathbf a+\mathbf u,
-$$
-where $\mathbf d\in\mathbb R^n$ and $\mathbf X\in\mathbb R^{n\times k}$
-contain the centered dependent observations and scaling indicator
-observations defined above, and $\mathbf u\in\mathbb R^n$ contains the
-centered composite errors.
-
-The hypothesized model identifies observed instruments
-$\mathbf z\in\mathbb R^\ell$ satisfying
-
-$$
-\operatorname{Cov}(\mathbf z,u)=\mathbf0,
-\qquad
-\operatorname{rank}\{\operatorname{Cov}(\mathbf z,\mathbf x)\}=k,
-\qquad
-\ell\geq k.
-$$
-
-The first condition concerns instrument validity and the second instrument
-relevance.
-
-Let $\mathbf Z\in\mathbb R^{n\times\ell}$ contain the centered instrument
-observations. The first stage regresses the explanatory variables on the
-instruments:
+The model identifies instruments $\mathbf z\in\mathbb R^\ell$ satisfying
+the validity and relevance conditions
+$\operatorname{Cov}(\mathbf z,u)=\mathbf0$,
+$\operatorname{rank}\{\operatorname{Cov}(\mathbf z,\mathbf x)\}=k$, and
+$\ell\geq k$. Let $\mathbf Z\in\mathbb R^{n\times\ell}$ contain their centered
+observations. Regressing the explanatory variables on the instruments
+gives
 
 $$
 \widehat{\mathbf X}
@@ -724,8 +633,7 @@ $$
 \mathbf Z(\mathbf Z^\top\mathbf Z)^{-1}\mathbf Z^\top
 \in\mathbb R^{n\times n}.
 $$
-
-The second stage regresses the dependent variable on these fitted values:
+Regressing the response on these fitted values then gives
 
 $$
 \widehat{\mathbf a}_{\mathrm{MIIV}}
@@ -733,38 +641,23 @@ $$
 (\widehat{\mathbf X}^{\top}\widehat{\mathbf X})^{-1}
 \widehat{\mathbf X}^{\top}\mathbf d
 =
-(\mathbf X^\top\mathbf P\mathbf X)^{-1}
-\mathbf X^\top\mathbf P\mathbf d.
+(\mathbf X^\top\mathbf P\mathbf X)^{-1}\mathbf X^\top\mathbf P\mathbf d.
 $$
 
-The matrices to be inverted are assumed nonsingular, and the loadings and
-slopes are not subject to equality constraints.
-
-Both approaches therefore use fitted predictors in a least squares
-regression. JS and JSA construct them through an estimated reliability
-adjustment, whereas MIIV constructs them by projecting the scaling
-indicators onto model-implied instruments.
+Both approaches regress the response on fitted predictors. JS and JSA
+obtain them through an estimated reliability adjustment, whereas MIIV
+projects the scaling indicators onto model-implied instruments.
 
 # Estimation of Variance, Covariance, and Intercept Parameters
 
 After estimating the factor loadings and latent regression slopes, the
 remaining variance and covariance parameters can be estimated using several
-least squares procedures [@maydeuolivares_etall_2026]. For all three
-estimators, we use reweighted least squares, the default in the
-implementations considered, holding the estimated loadings and slopes fixed
-throughout the iterations. Let
+least squares procedures [see @maydeuolivares_etall_2026, for a comparison
+of such procedures with MIIV]. For JS, JSA, and
+MIIV, we use reweighted least squares, the default in the implementations
+considered, holding the estimated loadings and slopes fixed.
 
-$$
-\widehat{\mathbf H}
-=
-\widehat{\boldsymbol\Lambda}
-(\mathbf I_q-\widehat{\mathbf B})^{-1}
-\in\mathbb R^{p\times q},
-$$
-where $\widehat{\boldsymbol\Lambda}$ and $\widehat{\mathbf B}$ are obtained
-using JS, JSA, or MIIV, assuming that $\mathbf I_q-\widehat{\mathbf B}$ is
-nonsingular. Conditional on these estimates, the implied covariance matrix
-is
+Substituting these estimates into @eq-implied-covariance gives
 
 $$
 \boldsymbol\Sigma(\mathbf v)
@@ -773,44 +666,35 @@ $$
 \widehat{\mathbf H}^{\top}
 +
 \boldsymbol\Theta(\mathbf v),
-$$
-where $\mathbf v\in\mathbb R^{d_v}$ collects the free variance and
-covariance parameters.
-
-Conditional on the estimated loadings and slopes, the implied covariance
-moments are linear in these parameters [@ernst_etall_2023]. Incorporating
-fixed entries and linear equality restrictions gives
-
-$$
-\operatorname{vech}\{\boldsymbol\Sigma(\mathbf v)\}
+\qquad
+\widehat{\mathbf H}
 =
-\widehat{\mathbf c}+\widehat{\mathbf G}\mathbf v,
+\widehat{\boldsymbol\Lambda}
+(\mathbf I_q-\widehat{\mathbf B})^{-1}
+\in\mathbb R^{p\times q},
 $$
-where $t=p(p+1)/2$, $\widehat{\mathbf c}\in\mathbb R^t$ is the fixed
-component under the chosen parameterization, and
-$\widehat{\mathbf G}\in\mathbb R^{t\times d_v}$ maps the free parameters to
-the implied covariance moments.
+assuming that $\mathbf I_q-\widehat{\mathbf B}$ is nonsingular. Here,
+$\mathbf v\in\mathbb R^{d_v}$ collects the free variance and covariance
+parameters in $\boldsymbol\Theta$ and $\boldsymbol\Psi$. With
+$\widehat{\mathbf H}$ held fixed, the implied covariance moments are linear
+in $\mathbf v$ [@browne_1974; @ernst_etall_2023], that is,
+$\operatorname{vech}\{\boldsymbol\Sigma(\mathbf v)\}=\widehat{\mathbf c}+\widehat{\mathbf G}\mathbf v$.
+Here, $t=p(p+1)/2$, $\widehat{\mathbf c}\in\mathbb R^t$ contains the fixed
+component, and $\widehat{\mathbf G}\in\mathbb R^{t\times d_v}$ maps the
+free parameters to the implied moments, incorporating any linear equality
+restrictions.
 
-For a weight matrix $\widehat{\mathbf W}\in\mathbb S_{++}^t$, the weighted
-least squares estimate is
+For a weight matrix $\widehat{\mathbf W}\in\mathbb S_{++}^t$,
 
 $$
 \widehat{\mathbf v}
 =
-\left(
-\widehat{\mathbf G}^{\top}
-\widehat{\mathbf W}
-\widehat{\mathbf G}
-\right)^{-1}
-\widehat{\mathbf G}^{\top}
-\widehat{\mathbf W}
-\left\{
-\operatorname{vech}(\mathbf S)-\widehat{\mathbf c}
-\right\},
-$$
-assuming that $\widehat{\mathbf G}$ has full column rank.
-
-Reweighted least squares updates the normal theory weight matrix using the
+(\widehat{\mathbf G}^{\top}\widehat{\mathbf W}\widehat{\mathbf G})^{-1}
+\widehat{\mathbf G}^{\top}\widehat{\mathbf W}
+\left\{\operatorname{vech}(\mathbf S)-\widehat{\mathbf c}\right\},
+$$ {#eq-wls}
+assuming full column rank of $\widehat{\mathbf G}$. 
+Reweighted least squares updates the normal theory weights using the
 current implied covariance matrix [@browne_1974; @lee_jennrich_1979]:
 
 $$
@@ -827,31 +711,22 @@ $$
 =
 \boldsymbol\Sigma(\widehat{\mathbf v}^{(\tau)}).
 $$
-
 Here, $\otimes$ denotes the Kronecker product, and
 $\mathbf D_p\in\mathbb R^{p^2\times t}$ is the duplication matrix
 satisfying
-
-$$
-\operatorname{vec}(\mathbf S)
-=
-\mathbf D_p\operatorname{vech}(\mathbf S).
-$$
-
-At iteration $\tau$, substituting $\widehat{\mathbf W}^{(\tau)}$ into the
-weighted least squares expression gives $\widehat{\mathbf v}^{(\tau+1)}$.
-This procedure is repeated until convergence, assuming that the implied
-covariance matrices used to construct the weights remain positive definite.
-The resulting $\widehat{\mathbf v}$ determines $\widehat{\boldsymbol\Theta}$
-and $\widehat{\boldsymbol\Psi}$, which are not constrained to be positive
+$\operatorname{vec}(\mathbf S)=\mathbf D_p\operatorname{vech}(\mathbf S)$.
+Substituting $\widehat{\mathbf W}^{(\tau)}$ into @eq-wls gives
+$\widehat{\mathbf v}^{(\tau+1)}$. This procedure continues
+until convergence, assuming positive definite implied covariance matrices
+throughout. The resulting $\widehat{\boldsymbol\Theta}$ and
+$\widehat{\boldsymbol\Psi}$ are not constrained to be positive
 semidefinite.
 
-Finally, the intercepts are estimated from the sample means, using the
-previously estimated factor loadings and latent regression slopes. Under
-the scaling indicator parameterization, the mean structure is saturated
-when all nonscaling indicator intercepts and all structural intercepts are
-free. Let $\overline{\mathbf m}\in\mathbb R^q$ contain the sample scaling
-indicator means, ordered by latent variable. Then
+Finally, intercepts are estimated from the sample means. When all
+nonscaling indicator intercepts and structural intercepts are free, the
+mean structure is saturated. Let $\overline{\mathbf m}\in\mathbb R^q$
+contain the sample scaling indicator means, ordered by latent variable.
+Then
 
 $$
 \widehat{\boldsymbol\mu}_\eta
@@ -867,48 +742,35 @@ $$
 \qquad
 \widehat{\boldsymbol\alpha}
 =
-(\mathbf I_q-\widehat{\mathbf B})
-\overline{\mathbf m}
+(\mathbf I_q-\widehat{\mathbf B})\overline{\mathbf m}
 \in\mathbb R^q.
-$$
-
-These expressions preserve the fixed zero scaling indicator intercepts and
-reproduce the observed sample means. Additional mean structure restrictions
-require a corresponding constrained estimation step.
+$$ {#eq-intercepts}
+The expressions in @eq-intercepts preserve the fixed zero scaling indicator intercepts and
+reproduce the sample means. Additional mean structure restrictions require
+constrained estimation.
 
 Together, these stages estimate the free entries of $\boldsymbol\Lambda$,
 $\mathbf B$, $\boldsymbol\Theta$, $\boldsymbol\Psi$, $\boldsymbol\nu$, and
-$\boldsymbol\alpha$. Although the estimated factor loadings and latent
-regression slopes are held fixed during covariance estimation, their
-sampling uncertainty is propagated when calculating standard errors.
+$\boldsymbol\alpha$. Although loadings and slopes are held fixed during
+covariance estimation, their sampling uncertainty is included in the
+standard error calculations.
 
 # Analytical Standard Errors
 
 ## James–Stein Estimation
 
-@burghgraeve_etall_2021 derived a variance expression for the latent
-regression slopes that accounts for the estimated reliability adjustment
-and used bootstrap standard errors in their evaluations. Here, analytical
-standard errors are obtained by differentiating the complete estimation
-procedure with respect to the sample moments. For
-$T\in\{\mathrm{JS},\mathrm{JSA}\}$, write
-
-$$
-\widehat{\boldsymbol\theta}_T
-=
-g_{n,T}(\mathbf s),
-$$
-where $g_{n,T}$ maps the $h$ sample moments to the $d$ parameter estimates.
-This mapping includes the preliminary error variance estimates, the
-estimates of the factor loadings and latent regression slopes, the
-subsequent variance and covariance estimates, and the intercept estimates.
+@burghgraeve_etall_2021 derived a variance expression for latent regression
+slopes accounting for the estimated reliability adjustment and used
+bootstrap standard errors in their evaluations. Here, analytical standard
+errors follow from differentiating the complete estimation procedure with
+respect to the sample moments. For $T\in\{\mathrm{JS},\mathrm{JSA}\}$,
+write $\widehat{\boldsymbol\theta}_T=g_{n,T}(\mathbf s)$, where $g_{n,T}$ maps the $h$ sample moments to the $d$ parameter estimates
+through the estimation stages described above.
 
 Suppose
 
 $$
-\sqrt n\{
-\mathbf s-\boldsymbol\sigma(\boldsymbol\theta)
-\}
+\sqrt n\{\mathbf s-\boldsymbol\sigma(\boldsymbol\theta)\}
 \xrightarrow{d}
 N_h(\mathbf0,\boldsymbol\Gamma),
 \qquad
@@ -916,7 +778,7 @@ N_h(\mathbf0,\boldsymbol\Gamma),
 $$
 where $\boldsymbol\Gamma$ is the joint asymptotic covariance matrix of the
 sample means and covariances. Under the required moment and
-differentiability conditions, the delta method covariance estimator is
+differentiability conditions,
 
 $$
 \widehat{\mathbf V}_T
@@ -936,37 +798,23 @@ $$
 \in\mathbb R^{d\times h}.
 $$
 
-The Jacobian propagates uncertainty through all estimation stages,
-including the intercept estimates. It is evaluated analytically by default,
-including implicit differentiation of the converged reweighted least squares
-equations. For JSA, it also incorporates derivatives of the estimated
-aggregation weights and normalization loadings.
+The Jacobian propagates uncertainty through all stages, including the
+preliminary error variances and intercept estimates. It is evaluated
+analytically by default, using implicit differentiation for the converged
+reweighted least squares equations. For JSA, it also includes derivatives
+of the aggregation weights and normalization loadings.
 
 The matrix $\boldsymbol\Gamma$ can be estimated using normal theory or
 empirical moments through order four [@browne_1984]. Normal theory
-estimates may be evaluated at the sample covariance matrix or the fitted
-model covariance matrix. For parameter $r=1,\ldots,d$, the analytical
-standard error is
-
-$$
-\widehat{\operatorname{SE}}(\widehat\theta_{T,r})
-=
-\sqrt{[\widehat{\mathbf V}_T]_{rr}}
-\in[0,\infty).
-$$
+estimates may use the sample or fitted covariance matrix. For parameter
+$j=1,\ldots,d$,
+$\widehat{\operatorname{SE}}(\widehat\theta_{T,j})=\sqrt{[\widehat{\mathbf V}_T]_{jj}}\in[0,\infty)$.
 
 ## Model-Implied Instrumental-Variable Estimation
 
-For the MIIV estimates of the factor loadings and latent regression slopes
-in one equation, the conventional homoskedastic covariance estimator is
-
-$$
-\widehat{\mathbf V}_{\mathbf a,\mathrm{MIIV}}
-=
-\widehat\sigma_u^{\,2}
-(\mathbf X^\top\mathbf P\mathbf X)^{-1}
-\in\mathbb S_+^k,
-$$
+For the MIIV loadings and slopes in one equation, the default
+homoskedastic covariance estimator is
+$\widehat{\mathbf V}_{\mathbf a,\mathrm{MIIV}}=\widehat\sigma_u^{\,2}(\mathbf X^\top\mathbf P\mathbf X)^{-1}\in\mathbb S_+^k$,
 where
 
 $$
@@ -979,77 +827,64 @@ $$
 =
 \mathbf d-\mathbf X\widehat{\mathbf a}_{\mathrm{MIIV}}.
 $$
-
-The intercept is absorbed by centering, and $n>k+1$ is assumed. Here,
-$\sigma_u^2$ is the variance of the composite error in the transformed
-equation, rather than an individual measurement error or structural
-disturbance variance. This is the default covariance estimator for the MIIV
-loadings and slopes in the implementation considered.
-
-For the variance and covariance parameters $\mathbf v$, the delta method
-accounts for uncertainty in the previously estimated loadings and slopes
-[@bollen_maydeuolivares_2007; @jin_etall_2021]. Define
-
-$$
-\widehat{\mathbf H}_2
-=
-(\widehat{\mathbf G}^{\top}
- \widehat{\mathbf W}
- \widehat{\mathbf G})^{-1}
-\widehat{\mathbf G}^{\top}
-\widehat{\mathbf W}
-\in\mathbb R^{d_v\times t},
-$$
-evaluated at the converged weights and treated as fixed in the
-linearization. Let $d_a$ denote the total number of free factor loadings
-and latent regression slopes. Let
-$\widehat{\boldsymbol\Delta}_1\in\mathbb R^{t\times d_a}$ be the Jacobian
-of the implied covariance moments with respect to these parameters,
-evaluated at the estimates, and let
-$\widehat{\mathbf K}\in\mathbb R^{d_a\times t}$ be the Jacobian of their
-MIIV estimates with respect to $\operatorname{vech}(\mathbf S)$
-[@fisher_bollen_2020].
-
-Under correct specification, the covariance estimator is
-
-$$
-\widehat{\mathbf V}_{\mathbf v,\mathrm{MIIV}}
-=
-\frac1n
-\widehat{\mathbf H}_2
-(\mathbf I_t-\widehat{\boldsymbol\Delta}_1\widehat{\mathbf K})
-\widehat{\boldsymbol\Gamma}_S
-(\mathbf I_t-\widehat{\boldsymbol\Delta}_1\widehat{\mathbf K})^\top
-\widehat{\mathbf H}_2^\top
-\in\mathbb S_+^{d_v},
-$$
-where $\widehat{\boldsymbol\Gamma}_S\in\mathbb S_+^t$ estimates the
-asymptotic covariance matrix of the sample covariance moments. It is the
-covariance-moment block of $\widehat{\boldsymbol\Gamma}$. The factor
-
-$$
-\mathbf I_t-\widehat{\boldsymbol\Delta}_1\widehat{\mathbf K}
-$$
-propagates the sampling uncertainty of the estimated factor loadings and
-latent regression slopes through the residual covariance moments.
-
-Moment based covariance estimates are also available for the MIIV factor
-loadings and latent regression slopes as
+Centering absorbs the intercept, and $n>k+1$ is assumed. Here,
+$\sigma_u^2$ is the composite error variance, rather than an individual
+measurement error or structural disturbance variance. Alternatively, moment 
+based standard errors for the MIIV loadings and
+slopes follow from the delta method. Let $d_a$ denote their total number
+and let $\widehat{\mathbf K}\in\mathbb R^{d_a\times t}$ be the Jacobian of
+their estimates with respect to $\operatorname{vech}(\mathbf S)$
+[@fisher_bollen_2020]. Their estimated covariance matrix is
 
 $$
 \frac1n
 \widehat{\mathbf K}
 \widehat{\boldsymbol\Gamma}_S
-\widehat{\mathbf K}^{\top}.
+\widehat{\mathbf K}^{\top},
 $$
+where $\widehat{\boldsymbol\Gamma}_S\in\mathbb S_+^t$ is the
+covariance-moment block of $\widehat{\boldsymbol\Gamma}$ for the MIIV fit.
 
-For the intercepts, moment based standard errors follow by differentiating
-the mean structure expressions with respect to the sample moments. These
-calculations provide delta method standard errors separately for each
-parameter block. In particular, the second stage expression uses the
-converged weights as fixed in its linearization, whereas the JS and JSA
-Jacobians differentiate the complete estimation procedure. A related delta
-method calculation for instrumental variable regression is presented by
+The Jacobian $\widehat{\mathbf K}$ also enters the standard error
+calculation for the subsequently estimated variance and covariance
+parameters, accounting for uncertainty in the previously estimated
+loadings and slopes [@bollen_maydeuolivares_2007; @jin_etall_2021].
+Define
+
+$$
+\widehat{\mathbf M}
+=
+(\widehat{\mathbf G}^{\top}\widehat{\mathbf W}\widehat{\mathbf G})^{-1}
+\widehat{\mathbf G}^{\top}\widehat{\mathbf W}
+\in\mathbb R^{d_v\times t},
+$$
+evaluated at the converged weights and treated as fixed in the
+linearization. Let $\widehat{\boldsymbol\Delta}_1\in\mathbb R^{t\times d_a}$
+be the Jacobian of the implied covariance moments with respect to the
+loadings and slopes, evaluated at the estimates. Under correct
+specification [@bollen_maydeuolivares_2007; @jin_etall_2021],
+
+$$
+\widehat{\mathbf V}_{\mathbf v,\mathrm{MIIV}}
+=
+\frac1n
+\widehat{\mathbf M}
+(\mathbf I_t-\widehat{\boldsymbol\Delta}_1\widehat{\mathbf K})
+\widehat{\boldsymbol\Gamma}_S
+(\mathbf I_t-\widehat{\boldsymbol\Delta}_1\widehat{\mathbf K})^\top
+\widehat{\mathbf M}^\top
+\in\mathbb S_+^{d_v}.
+$$
+Hence, note the factor
+$\mathbf I_t-\widehat{\boldsymbol\Delta}_1\widehat{\mathbf K}$ propagates
+uncertainty in the estimated loadings and slopes through the residual
+covariance moments. For intercepts, moment based standard errors follow by 
+differentiating the
+mean structure expressions. These calculations apply the delta method
+separately to each parameter block. The second stage linearization holds
+the converged weights fixed, whereas the JS and JSA Jacobians differentiate
+the complete estimation procedure. A related delta method calculation for
+instrumental variable regression is presented by
 @maydeuolivares_etall_2019.
 
 # Simulation Design and Performance Evaluation
@@ -1134,7 +969,7 @@ We employed a fully factorial design with two factors: sample size
 ($n\in\{100, 200, 300, 400, 500, 600\}$) and indicator reliability
 ($\rho\in\{.6, .8\}$). This yielded $6\times2=12$ conditions, each
 replicated 1,500 times. The sample sizes cover the small to moderate range
-in which the equation by equation estimators are expected to differ most
+in which the equation-by-equation estimators are expected to differ most
 from ML. The reliability levels match the low and high
 conditions of @burghgraeve_etall_2021 and determine the size of the
 reliability adjustment in JS and JSA. As highlighted throughout the article, 
@@ -1173,9 +1008,10 @@ counted.
 Performance was assessed with the measures implemented in the simhelpers
 package [@joshi_pustejovsky_2025], computed for every estimand. These
 measures, with their empirical and Monte Carlo standard error (MCSE)
-calculations, are listed in @tbl-performance. The MCSEs of the SD and
-of the SE$^2$/VAR ratio are obtained by jackknife and that of coverage in
-closed form. The SE/SD ratio and the SE$^2$/VAR ratio compare the same
+calculations, are listed in @tbl-performance. The MCSEs of the empirical
+standard deviation (SD) of the estimates and of the ratio of the mean
+squared standard error (SE$^2$) to the empirical variance (VAR) are
+obtained by jackknife and that of coverage in closed form. The SE/SD ratio and the SE$^2$/VAR ratio compare the same
 quantities on the standard deviation and on the variance scale, so only
 the latter, for which an MCSE is available, is shown in the figures.
 Coverage between .925 and .975 and SE$^2$/VAR ratios between 0.90 and 1.10
