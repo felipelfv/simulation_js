@@ -329,7 +329,7 @@ We use a scaling indicator parameterization
 per latent variable to one and the corresponding intercept to zero
 [@bollen_1989]. Each scaling indicator is assumed to load only on its
 corresponding latent variable. The loadings and slopes are obtained from
-centered observations, with intercepts estimated subsequently. The
+the sample covariances, with intercepts estimated subsequently. The
 following example illustrates how JS and MIIV address measurement error in
 a scaling indicator used as predictor.
 
@@ -602,7 +602,7 @@ The centered aggregates replace the columns of $\mathbf X$, and their error
 variance estimates form the diagonal of $\widehat{\boldsymbol\Omega}$, in
 matching order. Recomputing $\mathbf S_x$ and $\mathbf s_{xd}$ from these
 aggregates and applying @eq-js-estimator gives
-$\widehat{\mathbf a}_{\mathrm{JSA}}$, with the same response. JS and JSA
+$\widehat{\mathbf a}_{\mathrm{JSA}}$, with the same response. Thus, JS and JSA
 share @eq-js-estimator and differ in the construction of the proxies
 and their measurement error variances [@burghgraeve_etall_2021].
 
@@ -746,8 +746,12 @@ $$
 \in\mathbb R^q.
 $$ {#eq-intercepts}
 The expressions in @eq-intercepts preserve the fixed zero scaling indicator intercepts and
-reproduce the sample means. Additional mean structure restrictions require
-constrained estimation.
+reproduce the sample means. Additional mean structure restrictions are
+accommodated by generalized least squares, fitting
+$\boldsymbol\mu_y=\boldsymbol\nu+\widehat{\mathbf H}\boldsymbol\alpha$ to
+$\overline{\mathbf y}$ under those restrictions, with weight matrix
+$\widehat{\boldsymbol\Sigma}^{-1}$ where
+$\widehat{\boldsymbol\Sigma}=\boldsymbol\Sigma(\widehat{\mathbf v})$.
 
 Together, these stages estimate the free entries of $\boldsymbol\Lambda$,
 $\mathbf B$, $\boldsymbol\Theta$, $\boldsymbol\Psi$, $\boldsymbol\nu$, and
@@ -904,28 +908,31 @@ $$
 \end{aligned}
 $$ {#eq-pop-structural}
 
-The design is partly based on previous studies. @burghgraeve_etall_2021
-used four indicators per latent variable, a common reliability of .6 or .8
-for all indicators. Note also that the model is similar to the empirical 
-illustration in @burghgraeve_etall_2021. Moreover, 
+The design is partly based on previous studies. The measurement models
+follow the simulations of @burghgraeve_etall_2021, with four indicators per
+latent variable and a common reliability of .6 or .8 for all indicators.
+The structural model follows their empirical illustration, which has the
+same two structural equations. Moreover, 
 @jin_etall_2021 used a recursive latent variable model with several equations 
 and standardized slopes between 0.1 and 0.6, 
 which the present model follows partly with $B_{21}=0.6$, $B_{31}=0.3$, and
 $B_{32}=0.5$. With $\operatorname{Var}(\eta_1)=1$,
 $\operatorname{Var}(\zeta_2)=0.64$, and $\operatorname{Var}(\zeta_3)=0.48$,
-the variances of $\eta_2$ and $\eta_3$ equal 1, so that the slopes
-are standardized, and the implied correlations are .60 between $\eta_1$
-and $\eta_2$, .60 between $\eta_1$ and $\eta_3$, and .68 between $\eta_2$
-and $\eta_3$. The scaling indicators have loadings fixed to one and the
+the variances of $\eta_2$ and $\eta_3$ equal 1. All latent variables
+therefore have unit variance and the slopes equal their standardized
+values. The implied correlations are .60 between $\eta_1$ and $\eta_2$,
+.60 between $\eta_1$ and $\eta_3$, and .68 between $\eta_2$ and $\eta_3$. 
+The scaling indicators have loadings fixed to one and the
 remaining loadings range from 0.8 to 1.2. The mean structure has
-$E(\eta_1)=1$, $\alpha_2=\alpha_3=0.5$, and intercepts of 0.2 for the
-nonscaling indicators. The main estimands are all free factor
+$E(\eta_1)=1$, $\alpha_2=\alpha_3=0.5$, and $\nu_j=0.2$ for the
+nonscaling indicators, where $j$ indexes the indicators in @fig-model. 
+The main estimands are all free factor
 loadings, latent regression slopes, residual variances, and latent variances
 and disturbance variances. 
 
 ```{tikz}
 %| label: fig-model
-%| fig-cap: "Path diagram of the simulation model with three latent variables and their indicators."
+%| fig-cap: "Diagram of the simulation model with three latent variables and their indicators."
 %| apa-note: "NoNote *Note.* Scaling indicator loadings are fixed to one. The population latent regression slopes are $B_{21} = 0.6$, $B_{31} = 0.3$, and $B_{32} = 0.5$. Intercepts, measurement errors, disturbances, and variances are omitted for clarity."
 %| echo: false
 %| fig-ext: pdf
@@ -970,11 +977,10 @@ We employed a fully factorial design with two factors: sample size
 ($\rho\in\{.6, .8\}$). This yielded $6\times2=12$ conditions, each
 replicated 1,500 times. The sample sizes cover the small to moderate range
 in which the equation-by-equation estimators are expected to differ most
-from ML. The reliability levels match the low and high
-conditions of @burghgraeve_etall_2021 and determine the size of the
-reliability adjustment in JS and JSA. As highlighted throughout the article, 
-we investigated the JS, JSA, MIIV, and ML approaches, all
-with the default options in lavaan [@rosseel_2012]. 
+from ML [e.g., @burghgraeve_etall_2021; @jin_etall_2021; @dhaene_rosseel_2024]. 
+The reliability levels match the low and high
+conditions of @burghgraeve_etall_2021, as mentioned before, and determine the 
+size of the reliability adjustment in JS and JSA. 
 
 ### Data Generation
 
@@ -984,10 +990,14 @@ was generated as $\eta_1\sim\mathcal{N}(1,1)$ and the structural
 disturbances as $\zeta_2\sim\mathcal{N}(0,0.64)$ and
 $\zeta_3\sim\mathcal{N}(0,0.48)$, from which $\eta_2$ and $\eta_3$ follow
 by @eq-pop-structural. The measurement error of each indicator was
-generated as normal with mean zero and variance $\lambda^2(1-\rho)/\rho$,
-where $\lambda$ is the loading of that indicator, so that every indicator
-has reliability $\rho$ in its condition, and the indicators follow by the
-measurement equations. The observed variables are therefore multivariate
+generated as $\epsilon_j\sim\mathcal{N}\{0,\lambda_j^2(1-\rho)/\rho\}$,
+where $\lambda_j$ is the loading of indicator $j$. This entails that every
+indicator has reliability $\rho\in\{.6,.8\}$ in its condition. The indicators 
+were then obtained from the measurement equations 
+$y_j=\nu_j+\lambda_j\eta_l+\epsilon_j$,
+where $\eta_l$ is the latent variable measured by indicator $j$ in
+@fig-model, with $\nu_j=0$ and $\lambda_j=1$ for the scaling indicators. 
+The observed variables are therefore multivariate
 normal with the mean vector and covariance matrix implied by the
 population values. 
 
@@ -1000,20 +1010,21 @@ bound of an estimand was missing or non-finite. Among the converged
 replications, outliers were point estimates more than three interquartile
 ranges below the first or above the third quartile, per condition,
 estimator, and estimand. Inadmissible
-solutions, with a nonpositive variance estimate, were retained and
-counted.
+solutions, with a nonpositive estimate of a residual, latent, or
+disturbance variance, were retained and counted.
 
 ### Performance Measures
 
 Performance was assessed with the measures implemented in the simhelpers
 package [@joshi_pustejovsky_2025], computed for every estimand. These
 measures, with their empirical and Monte Carlo standard error (MCSE)
-calculations, are listed in @tbl-performance. The MCSEs of the empirical
-standard deviation (SD) of the estimates and of the ratio of the mean
-squared standard error (SE$^2$) to the empirical variance (VAR) are
-obtained by jackknife and that of coverage in closed form. The SE/SD ratio and the SE$^2$/VAR ratio compare the same
-quantities on the standard deviation and on the variance scale, so only
-the latter, for which an MCSE is available, is shown in the figures.
+calculations, are listed in @tbl-performance. Jackknife MCSEs are used
+for the empirical standard deviation (SD) of the estimates and for the
+ratio of the mean squared standard error (SE$^2$) to the empirical variance
+(VAR). The MCSE of coverage is available in closed form. The SE/SD ratio
+and the SE$^2$/VAR ratio compare the same quantities on the standard
+deviation and on the variance scale. Only the latter, for which an MCSE is
+available, is shown in the figures.
 Coverage between .925 and .975 and SE$^2$/VAR ratios between 0.90 and 1.10
 were considered acceptable.
 
@@ -1053,9 +1064,9 @@ performance evaluation, and ggplot2 [@wickham_2016] for the figures. The
 computational environment was pinned with Nix [@dolstra_etall_2004] via the
 rix package [@rodrigues_baumann_2026], and a Dockerfile that builds the same
 environment inside a container is also provided. The article was written
-with the apaquarto extension [@schneider_2026]. For an extensive description of all
-files and how to reproduce the simulation study as well as the manuscript,
-see the repository.
+with the apaquarto extension [@schneider_2026]. For an extensive description 
+of all files and how to reproduce the simulation study as well as the 
+manuscript, see the repository.
 
 ```{r}
 #| label: performance
@@ -1171,7 +1182,8 @@ to those shown for the same latent variable, with SE$^2$/VAR ratios that differ
 by at most 0.15 and coverage by .03 in every condition.
 
 Overall, standard error performance was acceptable. Across all conditions,
-estimators, and parameters, `r sprintf("%.1f", 100 * mean(summ$coverage >=.925 & summ$coverage <= .975))`% 
+estimators, and parameters, 
+`r sprintf("%.1f", 100 * mean(summ$coverage >=.925 & summ$coverage <= .975))`% 
 of coverage rates fell between .925 and .975
 and `r sprintf("%.1f", 100 * mean(summ$rb_var >= .90 & summ$rb_var <= 1.10))`%
 of SE$^2$/VAR ratios between 0.90 and 1.10, with no ratio below 0.90. From
