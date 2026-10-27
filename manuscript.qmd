@@ -613,10 +613,8 @@ and their centered observations. Substituting $\mathbf f=\mathbf x-\mathbf e$
 produces the composite error $u=\delta-\mathbf a^\top\mathbf e$. After
 centering and stacking observations [@bollen_1996],
 $\mathbf d=\mathbf X\mathbf a+\mathbf u$, where $\mathbf u\in\mathbb R^n$
-contains the centered composite errors.
-
-The model identifies instruments $\mathbf z\in\mathbb R^\ell$ satisfying
-the validity and relevance conditions
+contains the centered composite errors. The model identifies instruments
+$\mathbf z\in\mathbb R^\ell$ satisfying the validity and relevance conditions
 $\operatorname{Cov}(\mathbf z,u)=\mathbf0$,
 $\operatorname{rank}\{\operatorname{Cov}(\mathbf z,\mathbf x)\}=k$, and
 $\ell\geq k$. Let $\mathbf Z\in\mathbb R^{n\times\ell}$ contain their centered
