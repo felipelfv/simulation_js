@@ -916,19 +916,20 @@ same two structural equations. Moreover,
 @jin_etall_2021 used a recursive latent variable model with several equations 
 and standardized slopes between 0.1 and 0.6, 
 which the present model follows partly with $B_{21}=0.6$, $B_{31}=0.3$, and
-$B_{32}=0.5$. With $\operatorname{Var}(\eta_1)=1$,
-$\operatorname{Var}(\zeta_2)=0.64$, and $\operatorname{Var}(\zeta_3)=0.48$,
-the variances of $\eta_2$ and $\eta_3$ equal 1. All latent variables
-therefore have unit variance and the slopes equal their standardized
-values. The implied correlations are .60 between $\eta_1$ and $\eta_2$,
+$B_{32}=0.5$. The disturbance variances were chosen so that all latent
+variables have unit variance. With $\operatorname{Var}(\eta_1)=1$, setting
+$\operatorname{Var}(\zeta_2)=0.64$ and $\operatorname{Var}(\zeta_3)=0.48$
+gives $\operatorname{Var}(\eta_2)=\operatorname{Var}(\eta_3)=1$. The slopes
+therefore equal their standardized values. The implied correlations are .60 
+between $\eta_1$ and $\eta_2$,
 .60 between $\eta_1$ and $\eta_3$, and .68 between $\eta_2$ and $\eta_3$. 
 The scaling indicators have loadings fixed to one and the
 remaining loadings range from 0.8 to 1.2. The mean structure has
 $E(\eta_1)=1$, $\alpha_2=\alpha_3=0.5$, and $\nu_j=0.2$ for the
 nonscaling indicators, where $j$ indexes the indicators in @fig-model. 
 The main estimands are all free factor
-loadings, latent regression slopes, residual variances, and latent variances
-and disturbance variances. 
+loadings, latent regression slopes, measurement error variances, and latent 
+variances and disturbance variances. 
 
 ```{tikz}
 %| label: fig-model
@@ -1010,7 +1011,7 @@ bound of an estimand was missing or non-finite. Among the converged
 replications, outliers were point estimates more than three interquartile
 ranges below the first or above the third quartile, per condition,
 estimator, and estimand. Inadmissible
-solutions, with a nonpositive estimate of a residual, latent, or
+solutions, with a nonpositive estimate of a measurement error, latent, or
 disturbance variance, were retained and counted.
 
 ### Performance Measures
@@ -1028,10 +1029,10 @@ available, is shown in the figures.
 Coverage between .925 and .975 and SE$^2$/VAR ratios between 0.90 and 1.10
 were considered acceptable.
 
-Although the evaluation targets the standard errors, the relative bias of
-the estimates was also computed, because standard errors of markedly
-biased estimates are of limited use for inference. It is reported in the
-text, but not in the figures.
+We also note that, although the evaluation targets the standard errors, 
+the relative bias of the estimates was also computed, because standard errors 
+of markedly biased estimates are of limited use for inference. It is reported 
+in the text, but not in the figures.
 
 ```{r}
 #| label: tbl-performance
@@ -1175,20 +1176,20 @@ values.
 Each figure presents reliability .6 in the upper half and .8 in the lower
 half. @fig-sim-structural shows the latent regression slopes,
 @fig-sim-loadings one loading per latent variable, @fig-sim-residual the
-residual variances of the scaling indicators and one nonscaling indicator per
-latent variable, and @fig-sim-factorvar the variance of $\eta_1$ and the two
-disturbance variances. Omitted loadings and residual variances behave similarly 
-to those shown for the same latent variable, with SE$^2$/VAR ratios that differ 
-by at most 0.15 and coverage by .03 in every condition.
-
-Overall, standard error performance was acceptable. Across all conditions,
+measurement error variances of the scaling indicators and one nonscaling 
+indicator per latent variable, and @fig-sim-factorvar the variance of $\eta_1$ 
+and the two disturbance variances. Omitted loadings and measurement error 
+variances behave similarly to those shown for the same latent variable, with 
+SE$^2$/VAR ratios that differ 
+by at most 0.15 and coverage by .03 in every condition. Overall, standard
+error performance was acceptable. Across all conditions,
 estimators, and parameters, 
 `r sprintf("%.1f", 100 * mean(summ$coverage >=.925 & summ$coverage <= .975))`% 
 of coverage rates fell between .925 and .975
 and `r sprintf("%.1f", 100 * mean(summ$rb_var >= .90 & summ$rb_var <= 1.10))`%
 of SE$^2$/VAR ratios between 0.90 and 1.10, with no ratio below 0.90. From
 $n=300$ onward, the few ratios above 1.10 remained below 1.12. Three
-departures emerge at $n=100$ and $n=200$, mainly at reliability .6.
+departures are concentrated at $n=100$ and $n=200$, mainly at reliability .6.
 
 First, JS standard errors for $B_{31}$ and $B_{32}$ exceed the acceptable
 range at reliability .6, with SE$^2$/VAR ratios of 1.5–1.6 at $n=100$ and
@@ -1214,7 +1215,7 @@ disturbance variances, with ratios of 1.11–1.18, but its coverage rates of
 to 1 but coverage rates of .91–.94 for the disturbance variances. JS and JSA
 fall between them. At reliability .8, the coverage rate for the disturbance
 variance of $\eta_2$ is about .92 for ML, JS, and JSA, just below the
-acceptable range. Residual variances show less contrast, with coverage rates
+acceptable range. Measurement error variances show less contrast, with coverage rates
 from .91 to .96 across estimators and a common dip at $n=100$.
 
 ```{r}
@@ -1230,7 +1231,7 @@ plot_params(pars_coef, lab_coef)
 ```{r}
 #| label: fig-sim-loadings
 #| fig-cap: "Performance of the Standard Errors of One Factor Loading per Latent Variable"
-#| apa-note: "NoNote *Note.* JS = scaling James–Stein, JSA = aggregated James–Stein, IV = MIIV, ML = maximum likelihood. Dotted lines mark the reference values 1 and .95. Error bars represent Monte Carlo standard errors. Values above 1.5 are drawn at 1.5 with an open triangle."
+#| apa-note: "NoNote *Note.* JS = scaling James–Stein, JSA = aggregated James–Stein, IV = MIIV, ML = maximum likelihood. Dotted lines mark the reference values 1 and .95. Error bars represent Monte Carlo standard errors."
 #| fig-width: 6.5
 #| fig-height: 8.5
 #| out-width: "100%"
@@ -1239,8 +1240,8 @@ plot_params(pars_load, lab_load)
 
 ```{r}
 #| label: fig-sim-residual
-#| fig-cap: "Performance of the Standard Errors of the Residual Variances of the Scaling Indicator and One Nonscaling Indicator per Latent Variable"
-#| apa-note: "NoNote *Note.* JS = scaling James–Stein, JSA = aggregated James–Stein, IV = MIIV, ML = maximum likelihood. Dotted lines mark the reference values 1 and .95. Error bars represent Monte Carlo standard errors. Values above 1.5 are drawn at 1.5 with an open triangle."
+#| fig-cap: "Performance of the Standard Errors of the Measurement Error Variances of the Scaling Indicator and One Nonscaling Indicator per Latent Variable"
+#| apa-note: "NoNote *Note.* JS = scaling James–Stein, JSA = aggregated James–Stein, IV = MIIV, ML = maximum likelihood. Dotted lines mark the reference values 1 and .95. Error bars represent Monte Carlo standard errors."
 #| fig-width: 6.5
 #| fig-height: 8.5
 #| out-width: "100%"
@@ -1250,7 +1251,7 @@ plot_params(pars_res, lab_res, breaks = c(100, 300, 500))
 ```{r}
 #| label: fig-sim-factorvar
 #| fig-cap: "Performance of the Standard Errors of the Latent and Disturbance Variances"
-#| apa-note: "NoNote *Note.* JS = scaling James–Stein, JSA = aggregated James–Stein, IV = MIIV, ML = maximum likelihood. Dotted lines mark the reference values 1 and .95. Error bars represent Monte Carlo standard errors. Values above 1.5 are drawn at 1.5 with an open triangle."
+#| apa-note: "NoNote *Note.* JS = scaling James–Stein, JSA = aggregated James–Stein, IV = MIIV, ML = maximum likelihood. Dotted lines mark the reference values 1 and .95. Error bars represent Monte Carlo standard errors."
 #| fig-width: 6.5
 #| fig-height: 8.5
 #| out-width: "100%"
@@ -1259,33 +1260,53 @@ plot_params(pars_fvar, lab_fvar)
 
 # Discussion
 
-This article described MIIV, JS, and JSA estimation as currently implemented in 
-the R package lavaan. It also developed and illustrated analytical standard 
-errors for JS and JSA. A reproducible simulation study evaluated their
-standard error accuracy against ML under correct model specification.
+This article presented JS and JSA estimation as implemented in the R
+package lavaan, starting from a worked example and using MIIV as a point of
+comparison within a common notation. It also developed and presented 
+analytical standard errors for JS and JSA by applying the delta method to the 
+complete estimation procedure. A reproducible simulation study then evaluated 
+their accuracy against MIIV and ML under correct model specification.
 
-The findings broadly align with the studies that motivated the simulation
-design. @bollen_2018, summarizing @bollen_etall_2007, reports few differences
-between MIIV and ML under correct specification with normally distributed
-data. Our results agree in terms of bias and standard error accuracy from
-$n=300$ onward, although MIIV remained less precise than ML for the latent
-regression slopes. @jin_etall_2021 found that low scaling indicator
-reliability can lead to biased MIIV estimates in small samples and that
-standard errors for variance parameters were the least accurate. Related
-patterns appeared here at reliability .6 and $n=100$, with loading bias and
-undercoverage, alongside inflated standard errors for latent and disturbance
-variances. @burghgraeve_etall_2021 found JS less efficient than JSA for latent
+The main finding is that the analytical standard errors of JS and JSA
+performed comparably to those of MIIV and ML. Both estimators were
+essentially unbiased in all conditions, and their coverage rates and
+SE$^2$/VAR ratios were acceptable from $n=300$ onward for essentially
+every parameter.
+The one notable departure concerned JS at reliability .6 and $n\le200$,
+where the standard errors of the slopes in the $\eta_3$ equation were too
+large. This pattern appears to reflect instability in the reliability
+adjustment when the fitted latent predictors are nearly collinear. JSA,
+which aggregates indicators within each latent variable, showed no
+corresponding instability. These results extend those of
+@burghgraeve_etall_2021, who found JS less efficient than JSA for latent
 regression estimation and JSA competitive with ML, consistent with the
-empirical standard deviations observed here. However, their bootstrap standard
-errors for JS were too small in small samples, whereas our analytical standard
-errors were too large at reliability .6 and $n\le200$. Whether this difference
-reflects the standard error methods or differences in the simulation
-conditions requires further investigation.
+empirical standard deviations observed here. Their bootstrap standard
+errors for JS were too small in small samples, however, whereas our
+analytical standard errors were too large. Whether this difference reflects
+the standard error methods or differences in the simulation conditions
+requires further investigation.
 
-The simulation was intended as a focused evaluation rather than an exhaustive
-comparison. Further research should compare MIIV, JS, and JSA across a broader
-range of conditions, including departures from normality and misspecification
-of the measurement and latent variable models.
+The MIIV results provide the contrast and broadly align with earlier
+studies. @bollen_2018, summarizing @bollen_etall_2007, reports few
+differences between MIIV and ML under correct specification with normally
+distributed data. Our results agree in terms of bias and standard error
+accuracy from $n=300$ onward, although MIIV remained less precise than ML
+for the latent regression slopes. @jin_etall_2021 found that low scaling
+indicator reliability can lead to biased MIIV estimates in small samples
+and, under that condition, to the least accurate standard errors for the
+variance parameters. Related patterns appeared here at reliability .6 and
+$n=100$, with loading bias and undercoverage, alongside inflated standard
+errors for latent and disturbance variances. JS and JSA showed neither the
+loading bias nor the undercoverage in these conditions.
+
+With this article and its simulation, we did not intend to compare the
+approaches exhaustively. Given that JS and JSA have received little
+attention so far, our aim was to show what they share with MIIV and that
+both can perform comparably to ML. We hope this encourages further
+evaluation of JS and JSA across a broader range of conditions, including
+departures from normality and misspecification of the measurement and
+latent variable models, where their equation-by-equation structure may
+matter most.
 
 \newpage{}
 
