@@ -24,7 +24,7 @@ COPY . /project
 # build the exact, pinned environment from the committed default.nix
 RUN nix-build
 
-# render the APA7 manuscript inside the reproducible Nix shell and copy the PDF
+# render the apa7 manuscript inside the reproducible Nix shell and copy the pdf
 #  to docs/ (mount docs/ to retrieve it). The simulation results in results/ are
 #  committed, so a render alone works.
 # to re-run the full pipeline (simulation, performance measures, render) instead:

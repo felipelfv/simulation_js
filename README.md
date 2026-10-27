@@ -13,7 +13,7 @@ The manuscript, figures, and other non-code content are licensed under a
 
 ```
 .
-├── .github/workflows/render.yaml  # GitHub Actions: renders the manuscript and commits the PDF on every push
+├── .github/workflows/render.yaml  # GitHub Actions: renders the manuscript and commits the pdf on every push
 ├── gen_env.R                  # generates default.nix via {rix} (pinned R + packages + Quarto + TeX)
 ├── default.nix                # generated environment definition (built with nix-shell)
 ├── Dockerfile                 # containerised build: installs Nix, builds the environment, renders the manuscript
@@ -28,13 +28,13 @@ The manuscript, figures, and other non-code content are licensed under a
 │   │                          #   rel_bias_mcse, sd, sd_mcse, se_sd, rb_var, rb_var_mcse,
 │   │                          #   coverage, coverage_mcse)
 │   └── screening.rds          # convergence, outlier, and inadmissibility counts
-├── manuscript.qmd             # paper source (APA 7 via the apaquarto extension)
+├── manuscript.qmd             # paper source (apa 7 via the apaquarto extension)
 ├── references.bib             # bibliography
 ├── manuscript.pdf             # rendered output
 ├── _extensions/               # vendored apaquarto extension
 └── docs/
-    ├── manuscript.pdf         # copy of the rendered PDF served via GitHub Pages
-    └── index.html             # redirect to the PDF
+    ├── manuscript.pdf         # copy of the rendered pdf served via GitHub Pages
+    └── index.html             # redirect to the pdf
 ```
 
 `manuscript.pdf` and `docs/` are rebuilt and committed on every push
@@ -161,15 +161,15 @@ is required. The image can either render the manuscript from the committed
 results or rerun the whole pipeline first.
 
 ```bash
-# Build the image (installs Nix, builds default.nix)
+# build the image (installs Nix, builds default.nix)
 docker build -t manuscript .
 
-# Option 1: render the manuscript from the committed results;
-# the PDF is written to your local docs/ folder
+# option 1: render the manuscript from the committed results.
+# the pdf is written to your local docs/ folder
 docker run --rm -v "$PWD/docs:/project/docs" manuscript
 
-# Option 2: rerun the simulation and the performance calculation, then render;
-# the .rds files are written to your local results/ folder and the PDF to docs/
+# option 2: rerun the simulation and the performance calculation, then render.
+# the .rds files are written to your local results/ folder and the pdf to docs/
 docker run --rm -v "$PWD/results:/project/results" -v "$PWD/docs:/project/docs" manuscript \
   nix-shell default.nix --run "Rscript run_all.R && quarto render manuscript.qmd && cp manuscript.pdf docs/"
 ```
@@ -180,7 +180,7 @@ Install R, Quarto, and the packages in the table above, as close to the listed
 versions as you can, and run the scripts directly:
 
 ```sh
-Rscript run_all.R                    # optional, about 55 minutes; runs simulation.R and performance_calculation.R
+Rscript run_all.R                    # optional, about 55 minutes. runs simulation.R and performance_calculation.R
                                      #   (results/ is committed, so this can be skipped)
 quarto render manuscript.qmd         # → manuscript.pdf
 ```
@@ -196,7 +196,7 @@ exactly that version:
 remotes::install_version("lavaan", version = "0.7-3")
 ```
 
-Rendering the manuscript also needs the TeX packages used by apaquarto;
-`quarto install tinytex` followed by the render will install the missing
-ones. Results obtained this way should match the committed ones up to
+Rendering the manuscript also needs the TeX packages used by apaquarto.
+Running `quarto install tinytex` followed by the render will install the
+missing ones. Results obtained this way should match the committed ones up to
 differences in the numerical libraries of your platform.

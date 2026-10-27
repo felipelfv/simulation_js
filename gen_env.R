@@ -1,14 +1,14 @@
 library(rix)
 
-# the simulation results in the manuscript were produced with the CRAN release
+# the simulation results in the manuscript were produced with the cran release
 # of lavaan 0.7-3 (published 2026-10-08). It is newer than the snapshot date and
-# not yet in the CRAN archive, so it is pinned to the 0.7-3 tag of the CRAN
-# GitHub mirror (cran/lavaan), which holds the exact CRAN source.
-rix(date = "2026-05-11", # available_dates(); 1.8.x quarto (1.9.37 has a pandoc bug)
+# not yet in the cran archive, so it is pinned to the 0.7-3 tag of the cran
+# GitHub mirror (cran/lavaan), which holds the exact cran source.
+rix(date = "2026-05-11", # available_dates(), 1.8.x quarto (1.9.37 has a pandoc bug)
     r_pkgs = c("ggplot2", "simhelpers",
                "knitr"),                   # knitr: R engine quarto uses for code chunks
-    system_pkgs = "quarto",                # quarto CLI to render the paper
-    # LaTeX deps for the Quarto PDF; extend as the build reports missing .sty
+    system_pkgs = "quarto",                # quarto cli to render the paper
+    # LaTeX deps for the Quarto pdf, extend as the build reports missing .sty
     tex_pkgs = c("amsmath", "framed", "fvextra", "fancyvrb", "booktabs",
                  "caption", "etoolbox", "xcolor", "geometry", "hyperref",
                  "float", "pgf", "standalone",
