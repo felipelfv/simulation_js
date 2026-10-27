@@ -1036,7 +1036,7 @@ in the text, but not in the figures.
 
 ```{r}
 #| label: tbl-performance
-#| tbl-cap: "Performance Measures for Evaluating the Standard Errors"
+#| tbl-cap: "Performance Measures"
 #| apa-note: "$\\hat\\theta_k$ is the estimate of parameter $\\theta$ in replication $k$ ($k = 1, \\dots, K$) and $\\bar{\\theta}$ the mean of the $K$ estimates. $\\widehat{SE}_k$ is the estimated standard error in replication $k$, $\\overline{SE} = \\tfrac{1}{K}\\sum_k \\widehat{SE}_k$, $\\overline{SE^2} = \\tfrac{1}{K}\\sum_k \\widehat{SE}_k^2$, and $L_k, U_k$ are the confidence interval limits. The subscript $(j)$ marks a leave-one-out jackknife replicate. The dash marks an MCSE that is not computed."
 tab <- data.frame(
   measure = c("Relative bias", "SD", "SE/SD ratio", "SE$^2$/VAR ratio", "Coverage"),

@@ -1,12 +1,13 @@
 # performance_calculation.R
-
 # screens the replications and computes the performance measures.
-# input:  results/replications.rds (written by simulation.R, which is run
-#  first if the file is missing)
+
+# input:  results/replications.rds (written by simulation.R, which is run 
+# first if the file is missing)
+
 # output: results/performance.rds, one row per condition, estimator, and
-#  estimand (K, bias, rel_bias, rel_bias_mcse, sd, sd_mcse, se_sd, rb_var,
-#  rb_var_mcse, coverage, coverage_mcse), and results/screening.rds, the
-#  convergence, outlier, and inadmissibility counts.
+# estimand (K, bias, rel_bias, rel_bias_mcse, sd, sd_mcse, se_sd, rb_var,
+# rb_var_mcse, coverage, coverage_mcse), and results/screening.rds, the
+# convergence, outlier, and inadmissibility counts.
 
 library(simhelpers)
 
@@ -17,12 +18,16 @@ est <- c("JS", "JSA", "IV", "ML")
 R <- max(res$replication); n_cond <- length(ns) * length(rels)
 
 # screening: convergence, outliers, inadmissible solutions
+# note: simulation.R drops an estimator's rows when its fit errors or does not
+# converge, and the non-finite check below only sees rows that exist. In the
+# reported run every cell has all 1500 replications, so nothing was dropped.
 res$cond <- paste(res$n, res$rel)
 key <- function(d) paste(d$cond, d$replication)
 nonfinite <- !is.finite(res$estimate) | !is.finite(res$se) |
   !is.finite(res$ci_lower) | !is.finite(res$ci_upper)
 nonconv <- unique(res[nonfinite, c("cond", "replication", "estimator")])
 res_c <- res[!key(res) %in% key(nonconv), ]
+
 out <- do.call(rbind, lapply(split(res_c, res_c[c("cond", "estimator", "parameter")]),
   function(x) {
     q <- quantile(x$estimate, c(0.25, 0.75)); iqr <- q[2] - q[1]
@@ -33,23 +38,28 @@ out <- do.call(rbind, lapply(split(res_c, res_c[c("cond", "estimator", "paramete
   }))
 out_rep <- unique(out[c("cond", "replication")])
 res_s <- res_c[!key(res_c) %in% key(out_rep), ]
+
 inad <- unique(res[grepl("~~", res$parameter) & res$estimate <= 0,
                    c("cond", "estimator", "replication")])
+
 scr <- list(
   nonconv = nrow(nonconv),
   removed = nrow(out_rep),
   removed_pct = 100 * nrow(out_rep) / (R * n_cond),
   removed_by_cond = sort(100 * table(out_rep$cond) / R, decreasing = TRUE),
-  flagged_by_est = 100 * table(unique(out[c("cond", "estimator", "replication")])$estimator) / (R * n_cond),
+  flagged_by_est = 100 * table(unique(out[c("cond", "estimator", 
+                                            "replication")])$estimator) / (R * n_cond),
   flagged_100_06 = 100 * table(factor(unique(out[out$cond == "100 0.6",
-                                                 c("estimator", "replication")])$estimator, levels = est)) / R,
+                                                 c("estimator", 
+                                                   "replication")])$estimator, levels = est)) / R,
   removed_replications = out_rep,
   inad = nrow(inad),
   inad_by = table(inad$estimator, inad$cond),
   inadmissible_replications = inad)
 
 # performance measures on the retained replications
-summ <- do.call(rbind, lapply(split(res_s, res_s[c("n", "rel", "estimator", "parameter")]),
+summ <- do.call(rbind, lapply(split(res_s, res_s[c("n", "rel", "estimator", 
+                                                   "parameter")]),
   function(x) {
     tp <- x$true[1]
     ab <- calc_absolute(x, estimates = estimate, true_param = tp,
