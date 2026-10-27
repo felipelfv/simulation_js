@@ -45,16 +45,8 @@ author-note:
   disclosures:
     study-registration: ~
     data-sharing: ~
-    conflict-of-interest: "The authors report there are no competing interests
-    to declare. Generative AI (Claude Opus 5.5, Anthropic) was used to create
-    all figures, with the TikZ and R code based on earlier files written by the
-    first author, and to improve the flow of the Introduction, Results, and 
-    Discussion. Commits containing AI generated code or text are marked as such
-    in the commit history of the project repository. All AI output and 
-    suggestions were checked by the first author, and the authors take full 
-    responsibility for the content of this article."
-    financial-support: "This project was funded by the Special Research Fund
-    (BOF) of Ghent University (BOF/24J/2023/144)."
+    conflict-of-interest: ~
+    financial-support: ~
     gratitude: ~
 
 abstract: |
@@ -1317,6 +1309,34 @@ evaluation of JS and JSA across a broader range of conditions, including
 departures from normality and misspecification of the measurement and
 latent variable models, where their equation-by-equation structure may
 matter most.
+
+\newpage{}
+
+## Data and Code Availability
+
+\noindent All code, simulation results, and the manuscript source are
+archived on Zenodo at [DOI to be inserted]. The archive provides a pinned
+computational environment and instructions to rerun the simulation and to
+render this article.
+
+## Funding
+
+\noindent This project was funded by the Special Research Fund (BOF) of
+Ghent University (BOF/24J/2023/144).
+
+## Conflicts of Interest
+
+\noindent The authors report there are no competing interests to declare.
+
+## Use of Generative AI
+
+\noindent Generative AI (Claude Opus 5.5, Anthropic) was used to create all
+figures, with the TikZ and R code based on earlier files written by the
+first author, and to improve the flow of the Introduction, Results, and
+Discussion. Commits containing AI generated code or text are marked as such
+in the commit history of the project repository. All AI output and
+suggestions were checked by the first author, and the authors take full
+responsibility for the content of this article.
 
 \newpage{}
 
