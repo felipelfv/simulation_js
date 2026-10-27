@@ -28,27 +28,32 @@ The manuscript, figures, and other non-code content are licensed under a
 │   │                          #   rel_bias_mcse, sd, sd_mcse, se_sd, rb_var, rb_var_mcse,
 │   │                          #   coverage, coverage_mcse)
 │   └── screening.rds          # convergence, outlier, and inadmissibility counts
-├── miiv_js_estimation.qmd     # paper source (APA 7 via the apaquarto extension)
+├── manuscript.qmd             # paper source (APA 7 via the apaquarto extension)
 ├── references.bib             # bibliography
-├── miiv_js_estimation.pdf     # rendered output
+├── manuscript.pdf             # rendered output
 ├── _extensions/               # vendored apaquarto extension
 └── docs/
-    ├── miiv_js_estimation.pdf # copy of the rendered PDF served via GitHub Pages
+    ├── manuscript.pdf         # copy of the rendered PDF served via GitHub Pages
     └── index.html             # redirect to the PDF
 ```
 
-`miiv_js_estimation.pdf` and `docs/` are rebuilt and committed on every push
+`manuscript.pdf` and `docs/` are rebuilt and committed on every push
 to `main` by the GitHub Actions workflow (`.github/workflows/render.yaml`),
 which builds the Nix environment and renders the manuscript from the saved
 results.
 
 ## Pipeline
 
+The commands below assume an R installation with the packages listed under
+[Reproducible Environment](#reproducible-environment) and the Quarto CLI. See
+[Three Ways to Reproduce the Article](#three-ways-to-reproduce-the-article)
+for obtaining such an environment with Nix, Docker, or plain R.
+
 `run_all.R` runs Steps 1 and 2 in sequence, so the whole simulation pipeline
 can be reproduced with a single command:
 
 ```sh
-nix-shell --pure --run 'Rscript run_all.R'
+Rscript run_all.R
 ```
 
 The steps can also be run separately, as described below.
@@ -60,7 +65,7 @@ the simulation.
 ### Step 1: Run the simulation
 
 ```sh
-nix-shell --pure --run 'Rscript simulation.R'    # → results/replications.rds
+Rscript simulation.R    # → results/replications.rds
 ```
 
 `simulation.R` generates the data under the population model and fits every
@@ -74,7 +79,7 @@ Sequoia 15.7.3.
 ### Step 2: Screen the replications and compute the performance measures
 
 ```sh
-nix-shell --pure --run 'Rscript performance_calculation.R'    # → results/{performance,screening}.rds
+Rscript performance_calculation.R    # → results/{performance,screening}.rds
 ```
 
 `performance_calculation.R` applies the two-step screening described in the
@@ -87,13 +92,14 @@ it runs `simulation.R` first.
 ### Step 3: Render the manuscript
 
 ```sh
-nix-shell --pure --run 'quarto render miiv_js_estimation.qmd'    # → miiv_js_estimation.pdf
+quarto render manuscript.qmd    # → manuscript.pdf
 ```
 
 The manuscript sources `performance_calculation.R`, so rendering it also
 regenerates `results/performance.rds` and `results/screening.rds` from the
 saved replications. Deleting `results/replications.rds` before rendering
-reruns the whole pipeline.
+reruns the simulation as well, so a single render then executes all three
+stages.
 
 ### Data flow
 
@@ -104,7 +110,7 @@ simulation.R ──> results/replications.rds
 performance_calculation.R ──> results/performance.rds, results/screening.rds
                           │
                           ▼
-miiv_js_estimation.qmd ──> miiv_js_estimation.pdf
+manuscript.qmd ──> manuscript.pdf
 ```
 
 ## Reproducible Environment
@@ -143,7 +149,7 @@ and [on Linux and Windows](https://docs.ropensci.org/rix/articles/setting-up-lin
 
 ```sh
 nix-build                                                        # builds the environment
-nix-shell --pure --run 'quarto render miiv_js_estimation.qmd'    # renders from the committed results
+nix-shell --pure --run 'quarto render manuscript.qmd'            # renders from the committed results
 nix-shell --pure --run 'Rscript run_all.R'                       # optional: reruns the simulation and performance measures first
 ```
 
@@ -156,16 +162,16 @@ results or rerun the whole pipeline first.
 
 ```bash
 # Build the image (installs Nix, builds default.nix)
-docker build -t miiv-js-manuscript .
+docker build -t manuscript .
 
 # Option 1: render the manuscript from the committed results;
 # the PDF is written to your local docs/ folder
-docker run --rm -v "$PWD/docs:/project/docs" miiv-js-manuscript
+docker run --rm -v "$PWD/docs:/project/docs" manuscript
 
 # Option 2: rerun the simulation and the performance calculation, then render;
 # the .rds files are written to your local results/ folder and the PDF to docs/
-docker run --rm -v "$PWD/results:/project/results" -v "$PWD/docs:/project/docs" miiv-js-manuscript \
-  nix-shell default.nix --run "Rscript run_all.R && quarto render miiv_js_estimation.qmd && cp miiv_js_estimation.pdf docs/"
+docker run --rm -v "$PWD/results:/project/results" -v "$PWD/docs:/project/docs" manuscript \
+  nix-shell default.nix --run "Rscript run_all.R && quarto render manuscript.qmd && cp manuscript.pdf docs/"
 ```
 
 ### 3. Plain R, without Nix or Docker
@@ -176,7 +182,7 @@ versions as you can, and run the scripts directly:
 ```sh
 Rscript run_all.R                    # optional, about 55 minutes; runs simulation.R and performance_calculation.R
                                      #   (results/ is committed, so this can be skipped)
-quarto render miiv_js_estimation.qmd # → miiv_js_estimation.pdf
+quarto render manuscript.qmd         # → manuscript.pdf
 ```
 
 lavaan must be version 0.7-3 or later (published on CRAN 2026-10-08). The

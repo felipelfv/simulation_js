@@ -39,18 +39,18 @@ jobs:
         nix-build
 
     - name: Render manuscript
-      run: nix-shell --run "quarto render miiv_js_estimation.qmd"
+      run: nix-shell --run "quarto render manuscript.qmd"
 
     - name: Stage docs for Pages
       run: |
         mkdir -p docs
-        cp miiv_js_estimation.pdf docs/miiv_js_estimation.pdf
-        printf '<meta http-equiv="refresh" content="0; url=miiv_js_estimation.pdf">' > docs/index.html
+        cp manuscript.pdf docs/manuscript.pdf
+        printf '<meta http-equiv="refresh" content="0; url=manuscript.pdf">' > docs/index.html
 
     - name: Push rendered manuscript
       run: |
         git pull --rebase --autostash origin main
-        git add miiv_js_estimation.pdf docs/
+        git add manuscript.pdf docs/
         if git diff --cached --quiet; then
           echo "No changes to commit."
         else

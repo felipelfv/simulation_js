@@ -28,6 +28,6 @@ RUN nix-build
 #  to docs/ (mount docs/ to retrieve it). The simulation results in results/ are
 #  committed, so a render alone works.
 # to re-run the full pipeline (simulation, performance measures, render) instead:
-#   docker run --rm -v "$PWD/results:/project/results" -v "$PWD/docs:/project/docs" miiv-js-manuscript \
-#     nix-shell default.nix --run "Rscript run_all.R && quarto render miiv_js_estimation.qmd && cp miiv_js_estimation.pdf docs/"
-CMD nix-shell default.nix --run "quarto render miiv_js_estimation.qmd && cp miiv_js_estimation.pdf docs/"
+#   docker run --rm -v "$PWD/results:/project/results" -v "$PWD/docs:/project/docs" manuscript \
+#     nix-shell default.nix --run "Rscript run_all.R && quarto render manuscript.qmd && cp manuscript.pdf docs/"
+CMD nix-shell default.nix --run "quarto render manuscript.qmd && cp manuscript.pdf docs/"

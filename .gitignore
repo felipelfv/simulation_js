@@ -3,8 +3,8 @@
 .Rprofile
 result
 literature/
-miiv_js_estimation_cache/
-miiv_js_estimation_files/
+manuscript_cache/
+manuscript_files/
 *.fff
 *.ttt
 *.tex
