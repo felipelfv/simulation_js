@@ -131,34 +131,42 @@ time and in closed form, which may limit the propagation of misspecification
 across equations [@bollen_gates_fisher_2018; @burghgraeve_etall_2021] and
 avoids iterative optimization for this part of the estimation.
 
-This article focuses on James–Stein estimation, an equation-by-equation
-estimator proposed for SEMs with latent variables in
-@burghgraeve_etall_2021, which replaces each latent predictor by an estimate
-of its conditional expectation given observed proxies and then applies
-least squares. This conditional expectation is estimated using
-James–Stein type shrinkage [@james_stein_1961; @efron_morris_1973;
-@efron_morris_1975], and the approach follows the principle of regression
-calibration in errors-in-variables regression [@fuller_1987;
-@whittemore_1989; @carroll_etall_2006]. James–Stein estimation comes in a
-scaling version (JS), which uses the scaling indicators as proxies, and an
-aggregated version (JSA), which uses reliability weighted sums of
-indicators. Throughout this article, we also use model-implied
-instrumental-variable (MIIV) estimation^[Throughout this article, MIIV
-refers to model-implied instrumental-variable two-stage least squares
-(MIIV-2SLS) estimation [@bollen_1996; @bollen_2018]. Other estimators use
-the same model-implied instruments, such as MIIV-GMM
+A well-known equation-by-equation estimator in the SEM literature is
+model-implied instrumental-variable (MIIV) estimation^[Throughout this
+article, MIIV refers to model-implied instrumental-variable two-stage least
+squares (MIIV-2SLS) estimation [@bollen_1996; @bollen_2018]. Other
+estimators use the same model-implied instruments, such as MIIV-GMM
 [@bollen_kolenikov_bauldry_2014], which can estimate several equations
-jointly, but these are not considered here.] as a point of comparison.
-MIIV is one of the more widely known equation-by-equation estimators for
-SEMs and also replaces each latent variable by a scaling indicator, but
-corrects for the resulting measurement error with instruments implied by
-the model rather than with an estimated reliability adjustment
-[@bollen_1996; @bollen_bauer_2004; @bollen_2018]. JSA was found to
-outperform ML and MIIV in terms of mean squared error under the small
-sample conditions examined [@burghgraeve_etall_2021], and both versions
-were further evaluated for confirmatory factor models by
-@dhaene_rosseel_2024. Placing the two side by side makes clear what JS and
-JSA share with MIIV and where they depart from it.
+jointly, but these are not considered here.]
+[@bollen_1996; @bollen_bauer_2004; @bollen_2018]. MIIV replaces each latent
+variable by its scaling indicator, which turns every equation into one
+between observed variables. In this case, the measurement error of the
+scaling indicator becomes part of the error term of the equation and is
+correlated with the predictors. Ordinary least squares is therefore
+inconsistent, and MIIV corrects for the resulting measurement error with
+instruments implied by the model, estimating each equation by two-stage
+least squares.
+
+This article focuses on an alternative equation-by-equation estimator,
+James–Stein estimation, proposed for SEMs with latent variables in
+@burghgraeve_etall_2021, which replaces each latent predictor not by its
+scaling indicator but by an estimate of its conditional expectation given
+observed proxies and then applies least squares. The conditional
+expectation is uncorrelated with the error term of the equation by design,
+which removes the need for instruments. This conditional expectation is
+estimated using James–Stein type shrinkage [@james_stein_1961;
+@efron_morris_1973; @efron_morris_1975], which explains the name, and the
+approach follows the principle of regression calibration in
+errors-in-variables regression [@fuller_1987; @whittemore_1989;
+@carroll_etall_2006]. James–Stein estimation comes in a scaling version
+(JS), which uses the scaling indicators as proxies, and an aggregated
+version (JSA), which uses reliability weighted sums of indicators. JSA was
+found to outperform ML and MIIV in terms of mean squared error under the
+small sample conditions examined [@burghgraeve_etall_2021], and both
+versions were further evaluated for confirmatory factor models by
+@dhaene_rosseel_2024. Throughout this article, MIIV serves as a point of
+comparison. Placing the two side by side makes clear what JS and JSA share
+with MIIV and where they depart from it.
 
 Beyond point estimation, the usefulness of JS and JSA for statistical
 inference depends on the accuracy of their standard errors.
