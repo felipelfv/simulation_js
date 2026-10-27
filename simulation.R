@@ -1,12 +1,13 @@
 # simulation.R
-
 # monte carlo simulation code
+
 # generates the data and fits the four estimators in every replication.
 # output: results/replications.rds, one row per replication, estimator, and
-#  estimand (n, rel, replication, estimator, parameter, true, estimate, se,
-#  ci_lower, ci_upper).
+# estimand (n, rel, replication, estimator, parameter, true, estimate, se,
+# ci_lower, ci_upper).
+
 # runtime is about 55 minutes on an Apple M4 Pro with 24 GB of memory running
-#  macOS Sequoia 15.7.3.
+# macOS Sequoia 15.7.3.
 
 library(lavaan)
 set.seed(1234)
