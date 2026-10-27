@@ -1,6 +1,6 @@
 ---
 title: "James–Stein Estimation of Structural Equation Models With Latent Variables: A Case Study With lavaan"
-shorttitle: "MIIV and James–Stein Estimation"
+shorttitle: "James–Stein Estimation With lavaan"
 
 author:
   - name: Felipe Fontana Vieira

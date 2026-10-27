@@ -1,9 +1,9 @@
 # README
 
 This repository contains the code, results, and manuscript for the article
-**"Model-Implied Instrumental-Variable and James–Stein Estimation of
-Structural Equation Models: A Case Study With lavaan"** by Felipe Fontana
-Vieira and Yves Rosseel.
+**"James–Stein Estimation of Structural Equation Models With Latent
+Variables: A Case Study With lavaan"** by Felipe Fontana Vieira and Yves
+Rosseel.
 
 <sub>The code in this repository is licensed under the [MIT License](LICENSE).
 The manuscript, figures, and other non-code content are licensed under a
@@ -13,6 +13,7 @@ The manuscript, figures, and other non-code content are licensed under a
 
 ```
 .
+├── .github/workflows/render.yaml  # GitHub Actions: renders the manuscript and commits the PDF on every push
 ├── gen_env.R                  # generates default.nix via {rix} (pinned R + packages + Quarto + TeX)
 ├── default.nix                # generated environment definition (built with nix-shell)
 ├── Dockerfile                 # containerised build: installs Nix, builds the environment, renders the manuscript
