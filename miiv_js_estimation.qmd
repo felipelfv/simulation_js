@@ -1072,6 +1072,8 @@ manuscript, see the repository.
 ```{r}
 #| label: performance
 source("performance_calculation.R")
+
+## quantities reported inline in the results text
 pct <- function(x) sprintf("%.1f", 100 * x)
 rb_other <- max(abs(summ$rel_bias[summ$estimator != "IV"]))
 rb_iv100 <- summ[summ$estimator == "IV" & summ$n == 100 & summ$rel == 0.6, ]
@@ -1133,6 +1135,8 @@ plot_params <- function(pars, labels, breaks = ns) {
           panel.grid.minor = element_blank(),
           panel.border = element_rect(fill = NA, colour = "grey80"))
 }
+
+## parameters and panel labels for each figure
 pars_coef <- c("eta2~eta1", "eta3~eta1", "eta3~eta2")
 lab_coef  <- c("B[21]", "B[31]", "B[32]")
 pars_load <- c("eta1=~y2", "eta2=~y6", "eta3=~y10")
