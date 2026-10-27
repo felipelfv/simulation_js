@@ -16,7 +16,7 @@ The manuscript, figures, and other non-code content are licensed under a
 ├── .github/workflows/render.yaml  # GitHub Actions: renders the manuscript and commits the pdf on every push
 ├── gen_env.R                  # generates default.nix via {rix} (pinned R + packages + Quarto + TeX)
 ├── default.nix                # generated environment definition (built with nix-shell)
-├── Dockerfile                 # containerised build: installs Nix, builds the environment, renders the manuscript
+├── Dockerfile                 # Docker build: installs Nix, builds the environment, renders the manuscript
 ├── .dockerignore              # trims the Docker build context (excludes .git, result, caches)
 ├── run_all.R                  # runs simulation.R and then performance_calculation.R
 ├── simulation.R               # data generation and estimation → results/replications.rds
@@ -31,7 +31,7 @@ The manuscript, figures, and other non-code content are licensed under a
 ├── manuscript.qmd             # paper source (apa 7 via the apaquarto extension)
 ├── references.bib             # bibliography
 ├── manuscript.pdf             # rendered output
-├── _extensions/               # vendored apaquarto extension
+├── _extensions/               # apaquarto extension
 └── docs/
     ├── manuscript.pdf         # copy of the rendered pdf served via GitHub Pages
     └── index.html             # redirect to the pdf

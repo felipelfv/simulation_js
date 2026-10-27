@@ -18,7 +18,7 @@ RUN mkdir -p /root/.config/nix && \
 
 WORKDIR /project
 
-# bring in the whole compendium: pinned default.nix, scripts, results/, manuscript, etc.
+# bring in the whole repository: pinned default.nix, scripts, results/, manuscript, etc.
 COPY . /project
 
 # build the exact, pinned environment from the committed default.nix
