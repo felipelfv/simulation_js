@@ -1,0 +1,29 @@
+{
+  "title": "James–Stein Estimation of Structural Equation Models With Latent Variables: A Case Study With lavaan",
+  "upload_type": "software",
+  "description": "Code, simulation results, and manuscript source for the article \"James–Stein Estimation of Structural Equation Models With Latent Variables: A Case Study With lavaan\" by Felipe Fontana Vieira and Yves Rosseel, submitted to the Journal of Reproducible Statistics. The repository contains the R scripts for the Monte Carlo simulation and the performance measures, the saved results, the Quarto source of the manuscript, and a pinned computational environment (Nix via the rix package, with a Dockerfile) to reproduce the simulation study and render the article. The code is licensed under the MIT License. The manuscript, figures, and other non-code content are licensed under CC BY 4.0.",
+  "creators": [
+    {
+      "name": "Fontana Vieira, Felipe",
+      "affiliation": "Ghent University",
+      "orcid": "0009-0006-0949-6569"
+    },
+    {
+      "name": "Rosseel, Yves",
+      "affiliation": "Ghent University",
+      "orcid": "0000-0002-4129-4477"
+    }
+  ],
+  "license": "CC-BY-4.0",
+  "keywords": [
+    "structural equation modeling",
+    "James–Stein estimation",
+    "model-implied instrumental variables",
+    "delta method",
+    "simulation",
+    "lavaan",
+    "R"
+  ],
+  "notes": "This project was funded by the Special Research Fund (BOF) of Ghent University (BOF/24J/2023/144).",
+  "access_right": "open"
+}
