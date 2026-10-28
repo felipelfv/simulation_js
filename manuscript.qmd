@@ -196,8 +196,8 @@ both by applying the delta method to the complete estimation procedure. In
 addition, its JS and JSA implementations, initially restricted to
 confirmatory factor models, have been extended to more general models, and
 the package also includes MIIV estimation. Yet neither these analytical
-standard errors nor the extended implementations have been systematically
-evaluated.
+standard errors nor the extended implementations have been presented or
+systematically evaluated.
 
 ## Present Study and Contributions
 
@@ -689,7 +689,10 @@ component, and $\widehat{\mathbf G}\in\mathbb R^{t\times d_2}$ maps the
 free parameters to the implied moments, incorporating any linear equality
 restrictions.
 
-For a weight matrix $\widehat{\mathbf W}\in\mathbb S_{++}^t$,
+For a weight matrix $\widehat{\mathbf W}\in\mathbb S_{++}^t$, the weighted least
+squares estimator is the minimizer of
+$F(\boldsymbol\theta_2)=\{\operatorname{vech}(\mathbf S)-\widehat{\mathbf c}-\widehat{\mathbf G}\boldsymbol\theta_2\}^{\top}\widehat{\mathbf W}\{\operatorname{vech}(\mathbf S)-\widehat{\mathbf c}-\widehat{\mathbf G}\boldsymbol\theta_2\}$,
+namely
 
 $$
 \widehat{\boldsymbol\theta}_2
