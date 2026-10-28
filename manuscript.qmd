@@ -912,6 +912,12 @@ The reliability levels match the low and high
 conditions of @burghgraeve_etall_2021, as mentioned before, and determine the 
 size of the reliability adjustment in JS and JSA. 
 
+With respect to the estimation approaches, JS, JSA, MIIV, and ML were
+applied as implemented in lavaan, with a mean structure and the default
+settings of each estimator. For MIIV, each equation used all instruments
+implied by the model [@bollen_bauer_2004], and its standard errors are
+those of the default implementation.
+
 ### Data Generation
 
 Data were generated from the population model with all stochastic
@@ -1128,7 +1134,9 @@ reliability .6, with coverage of .88–.90 at $n=100$, compared with .93–.96 f
 the other estimators, despite SE$^2$/VAR ratios of 0.98–1.14 and the smallest
 SD. This discrepancy reflects the downward loading bias reported above,
 consistent with the known small-sample bias of IV estimators
-[@jin_etall_2021], and diminishes slowly as sample size increases.
+[@jin_etall_2021], which they found largest when all model-implied
+instruments are used, as here, and diminishes slowly as sample size
+increases.
 
 Third, at $n=100$ MIIV overestimates the standard errors of the latent and
 disturbance variances, with ratios of 1.11–1.18, but its coverage rates of
