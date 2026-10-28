@@ -241,7 +241,7 @@ $\mathbf B\in\mathbb R^{q\times q}$ contains the latent regression slopes,
 that is, the regression slopes among the latent variables. The measurement
 errors $\boldsymbol\epsilon\in\mathbb R^p$ and structural disturbances
 $\boldsymbol\zeta\in\mathbb R^q$ satisfy
-$E(\boldsymbol\epsilon)=\mathbf0$ and $E(\boldsymbol\zeta)=\mathbf0$.
+$\mathbb E(\boldsymbol\epsilon)=\mathbf0$ and $\mathbb E(\boldsymbol\zeta)=\mathbf0$.
 Let $\mathbb S_+^m$ and $\mathbb S_{++}^m$ denote the sets of symmetric
 positive semidefinite and positive definite $m\times m$ matrices,
 respectively. Assume
@@ -337,7 +337,7 @@ MIIV address measurement error in a scaling indicator used as a predictor.
 \begin{lsamexample}[A factor loading and a latent regression slope]
 Consider four indicators of $\eta_1$, with $y_1$ as its scaling indicator,
 so that $y_1=\eta_1+\epsilon_1$ and $y_r=\nu_r+\lambda_r\eta_1+\epsilon_r$
-for $r=2,3,4$. Assume $E(\epsilon_r)=0$,
+for $r=2,3,4$. Assume $\mathbb E(\epsilon_r)=0$,
 $\operatorname{Cov}(\eta_1,\epsilon_r)=0$, and
 $\operatorname{Cov}(\epsilon_r,\epsilon_s)=0$ for all $r\ne s$. The objective in this example is to estimate $\lambda_2$. Writing
 $\psi=\operatorname{Var}(\eta_1)$ and
@@ -353,13 +353,13 @@ Thus, measurement error in $y_1$ attenuates the slope. JS estimates the
 latent predictor from its scaling indicator. Under joint normality, it can be 
 shown that 
 $$
-E(\eta_1\mid y_1)
+\mathbb E(\eta_1\mid y_1)
 =
 \mu_1+R(y_1-\mu_1),
 \qquad
 R=\frac{\psi}{\psi+\omega_1},
 $$
-where $\mu_1=E(\eta_1)=E(y_1)$ (Burghgraeve et al., 2021). The other indicators 
+where $\mu_1=\mathbb E(\eta_1)=\mathbb E(y_1)$ (Burghgraeve et al., 2021). The other indicators 
 provide information about $\omega_1$, because
 $\operatorname{Cov}(y_1,y_3)=\lambda_3\psi$,
 $\operatorname{Cov}(y_1,y_4)=\lambda_4\psi$, and
@@ -437,7 +437,7 @@ $$
 Moreover, for either estimator,
 $\widehat\nu_2=\overline y_2-\widehat\lambda_2\overline y_1$ and
 $\widehat\alpha_2=\overline y_5-\widehat B_{21}\overline y_1$.
-Despite not shown in this example, we also note JSA follows the JS calculation 
+Although not shown in this example, we also note JSA follows the JS calculation 
 using a normalized aggregate of eligible indicators in place of $y_1$, 
 as described below. 
 \end{lsamexample}
@@ -468,7 +468,7 @@ where $\mathbf e\in\mathbb R^k$ contains the corresponding measurement
 errors. In the example, $f=\eta_1$, $x=y_1$, and $e=\epsilon_1$. Define
 
 $$
-\boldsymbol\mu_x=E(\mathbf f)=E(\mathbf x)\in\mathbb R^k,
+\boldsymbol\mu_x=\mathbb E(\mathbf f)=\mathbb E(\mathbf x)\in\mathbb R^k,
 \qquad
 \boldsymbol\Sigma_x=\operatorname{Var}(\mathbf x)\in\mathbb S_{++}^k,
 \qquad
@@ -478,7 +478,7 @@ Assume diagonal $\boldsymbol\Omega$ and
 $\operatorname{Cov}(\mathbf f,\mathbf e)=\mathbf0$. Under joint normality,
 
 $$
-E(\mathbf f\mid\mathbf x)
+\mathbb E(\mathbf f\mid\mathbf x)
 =
 \boldsymbol\mu_x+\mathbf R(\mathbf x-\boldsymbol\mu_x),
 \qquad
@@ -854,7 +854,7 @@ between $\eta_1$ and $\eta_2$,
 .60 between $\eta_1$ and $\eta_3$, and .68 between $\eta_2$ and $\eta_3$. 
 The scaling indicators have loadings fixed to one and the
 remaining loadings range from 0.8 to 1.2. The mean structure has
-$E(\eta_1)=1$, $\alpha_2=\alpha_3=0.5$, and $\nu_j=0.2$ for the
+$\mathbb E(\eta_1)=1$, $\alpha_2=\alpha_3=0.5$, and $\nu_j=0.2$ for the
 nonscaling indicators, where $j$ indexes the indicators in @fig-model. 
 The main estimands are all free factor
 loadings, latent regression slopes, measurement error variances, and latent 
