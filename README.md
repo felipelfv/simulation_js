@@ -197,6 +197,3 @@ remotes::install_version("lavaan", version = "0.7-3")
 ```
 
 Rendering the manuscript also needs the TeX packages used by apaquarto.
-Running `quarto install tinytex` followed by the render will install the
-missing ones. Results obtained this way should match the committed ones up to
-differences in the numerical libraries of your platform.

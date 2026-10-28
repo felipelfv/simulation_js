@@ -121,9 +121,9 @@ ML has desirable asymptotic properties when its assumptions hold
 [e.g, @browne_1984], difficulties may arise when it is applied in practice. 
 For instance, a misspecification in one equation can
 bias estimates in other equations [@kaplan_1988; @bollen_etall_2007;
-@bollen_2018; @dhaene_rosseel_2023; see also @jin_etall_2021, for diagonally
+@bollen_2019; @dhaene_rosseel_2023; see also @jin_etall_2021, for diagonally
 weighted least squares], and the iterative optimization can fail to converge
-or end in inadmissible solutions, especially in small samples [@bollen_2018;
+or end in inadmissible solutions, especially in small samples [@bollen_2019;
 @dhaene_rosseel_2023]. Equation-by-equation estimators offer an alternative
 [e.g., @bollen_1996; @burghgraeve_etall_2021]. With these approaches,
 factor loadings and latent regression slopes are estimated one equation at a
@@ -134,11 +134,11 @@ avoids iterative optimization for this part of the estimation.
 A well-known equation-by-equation estimator in the SEM literature is
 model-implied instrumental-variable (MIIV) estimation^[Throughout this
 article, MIIV refers to model-implied instrumental-variable two-stage least
-squares (MIIV-2SLS) estimation [@bollen_1996; @bollen_2018]. Other
+squares (MIIV-2SLS) estimation [@bollen_1996; @bollen_2019]. Other
 estimators use the same model-implied instruments, such as MIIV-GMM
 [@bollen_kolenikov_bauldry_2014], which can estimate several equations
 jointly, but these are not considered here.]
-[@bollen_1996; @bollen_bauer_2004; @bollen_2018]. MIIV replaces each latent
+[@bollen_1996; @bollen_bauer_2004; @bollen_2019]. MIIV replaces each latent
 variable by its scaling indicator, which turns every equation into one
 between observed variables. In this case, the measurement error of the
 scaling indicator becomes part of the error term of the equation and is
@@ -325,7 +325,7 @@ on these estimates.
 # Estimation of Factor Loadings and Latent Regression Slopes
 
 We use a scaling indicator parameterization
-[@bollen_1996; @bollen_2018; @burghgraeve_etall_2021], fixing one loading
+[@bollen_1996; @bollen_2019; @burghgraeve_etall_2021], fixing one loading
 per latent variable to one and the corresponding intercept to zero
 [@bollen_1989]. Each scaling indicator is assumed to load only on its
 corresponding latent variable. The loadings and slopes are obtained from
@@ -1212,7 +1212,7 @@ the standard error methods or differences in the simulation conditions
 requires further investigation.
 
 The MIIV results provide the contrast and broadly align with earlier
-studies. @bollen_2018, summarizing @bollen_etall_2007, reports few
+studies. @bollen_2019, summarizing @bollen_etall_2007, reports few
 differences between MIIV and ML under correct specification with normally
 distributed data. Our results agree in terms of bias and standard error
 accuracy from $n=300$ onward, although MIIV remained less precise than ML
