@@ -729,26 +729,21 @@ semidefinite.
 
 Finally, intercepts are estimated from the sample means. When all
 nonscaling indicator intercepts and structural intercepts are free, the
-mean structure is saturated. Let $\overline{\mathbf m}\in\mathbb R^q$
-contain the sample means of all $q$ scaling indicators, ordered by latent
-variable. Unlike $\overline{\mathbf x}$, which concerns the predictors of a
-single equation, $\overline{\mathbf m}$ covers every latent variable. Then
+mean structure is saturated. Let
+$\widehat{\boldsymbol\mu}_\eta\in\mathbb R^q$ contain the sample means of
+the scaling indicators, ordered by latent variable. Then
 
 $$
-\widehat{\boldsymbol\mu}_\eta
-=
-\overline{\mathbf m},
-\qquad
 \widehat{\boldsymbol\nu}
 =
 \overline{\mathbf y}
 -
-\widehat{\boldsymbol\Lambda}\overline{\mathbf m}
+\widehat{\boldsymbol\Lambda}\widehat{\boldsymbol\mu}_\eta
 \in\mathbb R^p,
 \qquad
 \widehat{\boldsymbol\alpha}
 =
-(\mathbf I_q-\widehat{\mathbf B})\overline{\mathbf m}
+(\mathbf I_q-\widehat{\mathbf B})\widehat{\boldsymbol\mu}_\eta
 \in\mathbb R^q.
 $$ {#eq-intercepts}
 The expressions in @eq-intercepts preserve the fixed zero scaling indicator intercepts and
