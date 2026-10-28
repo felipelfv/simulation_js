@@ -18,6 +18,7 @@ The manuscript, figures, and other non-code content are licensed under a
 ├── default.nix                # generated environment definition (built with nix-shell)
 ├── Dockerfile                 # Docker build: installs Nix, builds the environment, renders the manuscript
 ├── .dockerignore              # trims the Docker build context (excludes .git, result, caches)
+├── .zenodo.json               # metadata for the Zenodo archive of each GitHub release
 ├── run_all.R                  # runs simulation.R and then performance_calculation.R
 ├── simulation.R               # data generation and estimation → results/replications.rds
 ├── performance_calculation.R  # screening and performance measures → results/{performance,screening}.rds
