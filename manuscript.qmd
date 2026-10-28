@@ -690,9 +690,7 @@ free parameters to the implied moments, incorporating any linear equality
 restrictions.
 
 For a weight matrix $\widehat{\mathbf W}\in\mathbb S_{++}^t$, the weighted least
-squares estimator is the minimizer of
-$F(\boldsymbol\theta_2)=\{\operatorname{vech}(\mathbf S)-\widehat{\mathbf c}-\widehat{\mathbf G}\boldsymbol\theta_2\}^{\top}\widehat{\mathbf W}\{\operatorname{vech}(\mathbf S)-\widehat{\mathbf c}-\widehat{\mathbf G}\boldsymbol\theta_2\}$,
-namely
+squares estimator is
 
 $$
 \widehat{\boldsymbol\theta}_2
