@@ -1252,7 +1252,7 @@ with the apaquarto extension [@schneider_2026]. The simulation used a single
 seed with R's default random number generator, the Mersenne Twister. All code,
 simulation results, and the manuscript source, together with a description of 
 all files and instructions to reproduce the simulation study and the
-manuscript, are archived on Zenodo at [DOI to be inserted].
+manuscript, are archived on Zenodo at <https://doi.org/10.5281/zenodo.23730879>.
 
 ## Funding
 
