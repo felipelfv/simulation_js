@@ -155,7 +155,7 @@ observed proxies and then applies least squares. The conditional
 expectation is uncorrelated with the error term of the equation by design,
 which removes the need for instruments. This conditional expectation is
 estimated using James–Stein type shrinkage [@james_stein_1961;
-@efron_morris_1973; @efron_morris_1975], which explains the name, and the
+@efron_morris_1973; @efron_morris_1975], and the
 approach follows the principle of regression calibration in
 errors-in-variables regression [@fuller_1987; @whittemore_1989;
 @carroll_etall_2006]. James–Stein estimation comes in a scaling version
@@ -203,7 +203,7 @@ evaluated.
 
 This article makes three contributions. First, it describes
 JS and JSA, as implemented in lavaan, and conceptually compares them with
-MIIV estimation using a common notation, starting from a worked
+MIIV estimation, starting from a worked
 example. Second, it develops and
 illustrates a complete delta method calculation of standard errors for JS
 and JSA, accounting for uncertainty
@@ -329,10 +329,10 @@ We use a scaling indicator parameterization
 per latent variable to one and the corresponding intercept to zero
 [@bollen_1989]. Each scaling indicator is assumed to load only on its
 corresponding latent variable. The loadings and slopes are obtained from
-the sample covariances, with intercepts estimated subsequently. The
-following example, based on the model in @fig-model, illustrates how JS
-and MIIV address measurement error in a scaling indicator used as a
-predictor.
+the sample covariances, with intercepts estimated subsequently. To
+facilitate the presentation of the general expressions, we first present
+an example, based on the model in @fig-model, that illustrates how JS and
+MIIV address measurement error in a scaling indicator used as a predictor.
 
 \begin{lsamexample}[A factor loading and a latent regression slope]
 Consider four indicators of $\eta_1$, with $y_1$ as its scaling indicator,
@@ -423,7 +423,7 @@ $y_5=\eta_2+\epsilon_5$. Substitution gives
 $y_5=\alpha_2+B_{21}\eta_1+\zeta_2+\epsilon_5$, which has the form of the equation for $y_2$, with $\zeta_2+\epsilon_5$
 in place of $\epsilon_2$. Because $\zeta_2$ and $\epsilon_5$ are
 uncorrelated with $\eta_1$ and with $\epsilon_1,\ldots,\epsilon_4$, the
-same calculations give
+same calculations as for $\lambda_2$ give, with $y_5$ in place of $y_2$,
 $$
 \widehat B_{21,\mathrm{JS}}
 =
@@ -437,15 +437,15 @@ $$
 Moreover, for either estimator,
 $\widehat\nu_2=\overline y_2-\widehat\lambda_2\overline y_1$ and
 $\widehat\alpha_2=\overline y_5-\widehat B_{21}\overline y_1$.
-Despite not shown in this example, we note JSA follows the JS calculation 
+Despite not shown in this example, we also note JSA follows the JS calculation 
 using a normalized aggregate of eligible indicators in place of $y_1$, 
 as described below. 
 \end{lsamexample}
 
 ## James–Stein Estimation
 
-We now present the general expressions behind this example. JS and JSA
-proceed equation by equation. An equation belongs either to the
+We now present the general expressions behind this example. As highlighted, 
+JS and JSA proceed equation by equation. An equation belongs either to the
 measurement model, where it yields a factor loading, or to the structural
 model, where it yields a latent regression slope. The notation below refers
 to a single such equation. The expressions concern free loadings and slopes
@@ -623,7 +623,7 @@ contains the centered composite errors. The model identifies instruments
 $\mathbf z\in\mathbb R^\ell$ satisfying the validity and relevance conditions
 $\operatorname{Cov}(\mathbf z,u)=\mathbf0$,
 $\operatorname{rank}\{\operatorname{Cov}(\mathbf z,\mathbf x)\}=k$, and
-$\ell\geq k$. Let $\mathbf Z\in\mathbb R^{n\times\ell}$ contain their centered
+$\ell\geq k$ [@bollen_1996; @bollen_bauer_2004]. Let $\mathbf Z\in\mathbb R^{n\times\ell}$ contain their centered
 observations. Regressing the explanatory variables on the instruments
 gives
 
@@ -675,10 +675,10 @@ $$
 =
 \widehat{\boldsymbol\Lambda}
 (\mathbf I_q-\widehat{\mathbf B})^{-1}
-\in\mathbb R^{p\times q},
+\in\mathbb R^{p\times q}.
 $$
-assuming that $\mathbf I_q-\widehat{\mathbf B}$ is nonsingular. Here,
-$\boldsymbol\theta_2\in\mathbb R^{d_2}$, a subvector of $\boldsymbol\theta$, collects
+In this expression, $\boldsymbol\theta_2\in\mathbb R^{d_2}$, a subvector of
+$\boldsymbol\theta$, collects
 the free variance and covariance parameters in $\boldsymbol\Theta$ and
 $\boldsymbol\Psi$. With
 $\widehat{\mathbf H}$ held fixed, the implied covariance moments are linear
@@ -767,13 +767,17 @@ standard error calculations.
 
 # Analytical Standard Errors
 
-## James–Stein Estimation
-
 @burghgraeve_etall_2021 derived a variance expression for latent regression
 slopes accounting for the estimated reliability adjustment and used
 bootstrap standard errors in their evaluations. Here, analytical standard
 errors follow from differentiating the complete estimation procedure with
-respect to the sample moments. For $T\in\{\mathrm{JS},\mathrm{JSA}\}$,
+respect to the sample moments.^[Standard errors for MIIV are not treated
+here. They are well documented, with two-stage least squares and delta
+method expressions for the loadings and slopes [@bollen_1996;
+@fisher_bollen_2020; see also @maydeuolivares_etall_2019], and with
+expressions for the subsequently estimated
+variance and covariance parameters that account for uncertainty in the
+first-stage estimates [@bollen_maydeuolivares_2007; @jin_etall_2021].] For $T\in\{\mathrm{JS},\mathrm{JSA}\}$,
 write $\widehat{\boldsymbol\theta}_T=g_{n,T}(\mathbf s)$, where $g_{n,T}$ maps the $h$ sample moments to the $d$ parameter estimates
 through the estimation stages described above.
 
@@ -819,83 +823,6 @@ empirical moments through order four [@browne_1984]. Normal theory
 estimates may use the sample or fitted covariance matrix. For parameter
 $j=1,\ldots,d$,
 $\widehat{\operatorname{SE}}(\widehat\theta_{T,j})=\sqrt{[\widehat{\mathbf V}_T]_{jj}}\in[0,\infty)$.
-
-## Model-Implied Instrumental-Variable Estimation
-
-For the MIIV loadings and slopes in one equation, the default
-homoskedastic covariance estimator is
-$\widehat{\mathbf V}_{\mathbf a,\mathrm{MIIV}}=\widehat\sigma_u^{\,2}(\mathbf X^\top\mathbf P\mathbf X)^{-1}\in\mathbb S_+^k$,
-where
-
-$$
-\widehat\sigma_u^{\,2}
-=
-\frac{\widehat{\mathbf u}^{\top}\widehat{\mathbf u}}
-     {n-k-1},
-\qquad
-\widehat{\mathbf u}
-=
-\mathbf d-\mathbf X\widehat{\mathbf a}_{\mathrm{MIIV}}.
-$$
-Centering absorbs the intercept, and $n>k+1$ is assumed. Here,
-$\sigma_u^2$ is the composite error variance, rather than an individual
-measurement error or structural disturbance variance. Alternatively, moment 
-based standard errors for the MIIV loadings and
-slopes follow from the delta method. Let $d_a$ denote their total number
-and let $\widehat{\mathbf K}\in\mathbb R^{d_a\times t}$ be the Jacobian of
-their estimates with respect to $\operatorname{vech}(\mathbf S)$
-[@fisher_bollen_2020]. Their estimated covariance matrix is
-
-$$
-\frac1n
-\widehat{\mathbf K}
-\widehat{\boldsymbol\Gamma}_S
-\widehat{\mathbf K}^{\top},
-$$
-where $\widehat{\boldsymbol\Gamma}_S\in\mathbb S_+^t$ is the
-covariance-moment block of $\widehat{\boldsymbol\Gamma}$ for the MIIV fit.
-
-The Jacobian $\widehat{\mathbf K}$ also enters the standard error
-calculation for the subsequently estimated variance and covariance
-parameters, accounting for uncertainty in the previously estimated
-loadings and slopes [@bollen_maydeuolivares_2007; @jin_etall_2021].
-Define
-
-$$
-\widehat{\mathbf M}
-=
-(\widehat{\mathbf G}^{\top}\widehat{\mathbf W}\widehat{\mathbf G})^{-1}
-\widehat{\mathbf G}^{\top}\widehat{\mathbf W}
-\in\mathbb R^{d_2\times t},
-$$
-evaluated at the converged weights and treated as fixed in the
-linearization. Let $\widehat{\boldsymbol\Delta}_1\in\mathbb R^{t\times d_a}$
-be the Jacobian of the implied covariance moments with respect to the
-loadings and slopes, evaluated at the estimates. Under correct
-specification [@bollen_maydeuolivares_2007; @jin_etall_2021],
-
-$$
-\widehat{\mathbf V}_{\boldsymbol\theta_2,\mathrm{MIIV}}
-=
-\frac1n
-\widehat{\mathbf M}
-(\mathbf I_t-\widehat{\boldsymbol\Delta}_1\widehat{\mathbf K})
-\widehat{\boldsymbol\Gamma}_S
-(\mathbf I_t-\widehat{\boldsymbol\Delta}_1\widehat{\mathbf K})^\top
-\widehat{\mathbf M}^\top
-\in\mathbb S_+^{d_2}.
-$$
-Hence, note the factor
-$\mathbf I_t-\widehat{\boldsymbol\Delta}_1\widehat{\mathbf K}$ propagates
-uncertainty in the estimated loadings and slopes through the residual
-covariance moments. For intercepts, moment based standard errors follow by 
-differentiating the
-mean structure expressions. These calculations apply the delta method
-separately to each parameter block. The second stage linearization holds
-the converged weights fixed, whereas the JS and JSA Jacobians differentiate
-the complete estimation procedure. A related delta method calculation for
-instrumental variable regression is presented by
-@maydeuolivares_etall_2019.
 
 # Simulation Design and Performance Evaluation
 
@@ -1062,18 +989,6 @@ knitr::asis_output(paste0("\\begin{center}\n",
                col.names = c("Performance measure", "Empirical calculation", "MCSE")),
   "\n\\end{center}"))
 ```
-
-### Reproducibility and Computational Details
-
-All analyses were conducted in R [@rcoreteam_2026] using the lavaan package
-[@rosseel_2012] for estimation, simhelpers [@joshi_pustejovsky_2025] for
-performance evaluation, and ggplot2 [@wickham_2016] for the figures. The
-computational environment was pinned with Nix [@dolstra_etall_2004] via the
-rix package [@rodrigues_baumann_2026], and a Dockerfile that builds the same
-environment inside a container is also provided. The article was written
-with the apaquarto extension [@schneider_2026]. For an extensive description 
-of all files and how to reproduce the simulation study as well as the 
-manuscript, see the repository.
 
 ```{r}
 #| label: performance
@@ -1322,10 +1237,18 @@ matter most.
 
 ## Data and Code Availability
 
-\noindent All code, simulation results, and the manuscript source are
-archived on Zenodo at [DOI to be inserted]. The archive provides a pinned
-computational environment and instructions to rerun the simulation and to
-render this article.
+\noindent All analyses were conducted in R [@rcoreteam_2026] using the
+lavaan package [@rosseel_2012] for estimation, simhelpers
+[@joshi_pustejovsky_2025] for performance evaluation, and ggplot2
+[@wickham_2016] for the figures. The computational environment was pinned
+with Nix [@dolstra_etall_2004] via the rix package
+[@rodrigues_baumann_2026], and a Dockerfile that builds the same
+environment inside a container is also provided. The article was written
+with the apaquarto extension [@schneider_2026]. The simulation used a single
+seed with R's default random number generator, the Mersenne Twister. All code,
+simulation results, and the manuscript source, together with a description of 
+all files and instructions to reproduce the simulation study and the
+manuscript, are archived on Zenodo at [DOI to be inserted].
 
 ## Funding
 
