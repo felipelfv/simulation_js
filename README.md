@@ -1,5 +1,7 @@
 # README
 
+[![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.23730879.svg)](https://doi.org/10.5281/zenodo.23730879)
+
 This repository contains the code, results, and manuscript for the article
 **"James–Stein Estimation of Structural Equation Models With Latent
 Variables: A Case Study With lavaan"** by Felipe Fontana Vieira and Yves
