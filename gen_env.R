@@ -1,9 +1,8 @@
 library(rix)
 
-# the simulation results in the manuscript were produced with the cran release
-# of lavaan 0.7-3 (published 2026-10-08). It is newer than the snapshot date and
-# not yet in the cran archive, so it is pinned to the 0.7-3 tag of the cran
-# GitHub mirror (cran/lavaan), which holds the exact cran source.
+# the simulation results in the manuscript were produced with the development
+# version of lavaan 0.7-3.3364 (GitHub yrosseel/lavaan, commit ef620c8 of
+# 2026-11-01).
 rix(date = "2026-05-11", # available_dates(), 1.8.x quarto (1.9.37 has a pandoc bug)
     r_pkgs = c("ggplot2", "simhelpers",
                "knitr"),                   # knitr: R engine quarto uses for code chunks
@@ -21,8 +20,8 @@ rix(date = "2026-05-11", # available_dates(), 1.8.x quarto (1.9.37 has a pandoc 
                  "pdflscape", "babel-english"),
     git_pkgs = list(
       list(package_name = "lavaan",
-           repo_url = "https://github.com/cran/lavaan",
-           commit = "3d10d4a43d8d15ee683b78d4d6e769804ca87c7c")   # tag 0.7-3
+           repo_url = "https://github.com/yrosseel/lavaan",
+           commit = "ef620c8ed3cfd0cdf2821ad2c75e57bb75cf0358")   # 0.7-3.3364, 2026-11-01
     ),
     project_path = ".",
     overwrite = TRUE
