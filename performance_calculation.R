@@ -6,8 +6,10 @@
 
 # output: results/performance.rds, one row per condition, estimator, and
 # estimand (K, bias, rel_bias, rel_bias_mcse, sd, sd_mcse, se_sd, rb_var,
-# rb_var_mcse, coverage, coverage_mcse), and results/screening.rds, the
-# convergence, outlier, and inadmissibility counts.
+# rb_var_mcse, coverage, coverage_mcse), results/performance_unscreened.rds,
+# the same measures on the converged replications without outlier removal
+# (sensitivity check), and results/screening.rds, the convergence, outlier,
+# and inadmissibility counts.
 
 library(simhelpers)
 
@@ -57,30 +59,39 @@ scr <- list(
   inad_by = table(inad$estimator, inad$cond),
   inadmissible_replications = inad)
 
-# performance measures on the retained replications
-summ <- do.call(rbind, lapply(split(res_s, res_s[c("n", "rel", "estimator", 
-                                                   "parameter")]),
-  function(x) {
-    tp <- x$true[1]
-    ab <- calc_absolute(x, estimates = estimate, true_param = tp,
-                        criteria = c("bias", "stddev"))
-    rl <- calc_relative(x, estimates = estimate, true_param = tp,
-                        criteria = "relative bias")
-    rv <- calc_relative_var(x, estimates = estimate, var_estimates = se^2,
-                            criteria = "relative bias")
-    cv <- calc_coverage(x, lower_bound = ci_lower, upper_bound = ci_upper,
-                        true_param = tp, criteria = "coverage")
-    data.frame(x[1, c("n", "rel", "estimator", "parameter")],
-               K = ab$K_absolute,
-               bias = ab$bias,
-               rel_bias = rl$rel_bias - 1, rel_bias_mcse = rl$rel_bias_mcse,
-               sd = ab$stddev, sd_mcse = ab$stddev_mcse,
-               se_sd = mean(x$se) / ab$stddev,
-               rb_var = rv$rel_bias_var, rb_var_mcse = rv$rel_bias_var_mcse,
-               coverage = cv$coverage, coverage_mcse = cv$coverage_mcse)
-  }))
-rownames(summ) <- NULL
+# performance measures per condition, estimator, and estimand
+measures <- function(d) {
+  out <- do.call(rbind, lapply(split(d, d[c("n", "rel", "estimator",
+                                             "parameter")]),
+    function(x) {
+      tp <- x$true[1]
+      ab <- calc_absolute(x, estimates = estimate, true_param = tp,
+                          criteria = c("bias", "stddev"))
+      rl <- calc_relative(x, estimates = estimate, true_param = tp,
+                          criteria = "relative bias")
+      rv <- calc_relative_var(x, estimates = estimate, var_estimates = se^2,
+                              criteria = "relative bias")
+      cv <- calc_coverage(x, lower_bound = ci_lower, upper_bound = ci_upper,
+                          true_param = tp, criteria = "coverage")
+      data.frame(x[1, c("n", "rel", "estimator", "parameter")],
+                 K = ab$K_absolute,
+                 bias = ab$bias,
+                 rel_bias = rl$rel_bias - 1, rel_bias_mcse = rl$rel_bias_mcse,
+                 sd = ab$stddev, sd_mcse = ab$stddev_mcse,
+                 se_sd = mean(x$se) / ab$stddev,
+                 rb_var = rv$rel_bias_var, rb_var_mcse = rv$rel_bias_var_mcse,
+                 coverage = cv$coverage, coverage_mcse = cv$coverage_mcse)
+    }))
+  rownames(out) <- NULL
+  out
+}
+
+# main results on the retained replications, and the sensitivity check on the
+# converged replications without outlier removal
+summ <- measures(res_s)
+summ_all <- measures(res_c)
 
 # save
 saveRDS(summ, "results/performance.rds")
+saveRDS(summ_all, "results/performance_unscreened.rds")
 saveRDS(scr, "results/screening.rds")

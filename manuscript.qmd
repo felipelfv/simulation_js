@@ -1004,6 +1004,14 @@ rb_iv_load <- range(-rb_iv100$rel_bias[grepl("=~", rb_iv100$parameter)])
 rb_iv_var <- range(rb_iv100$rel_bias[grepl("^eta[0-9]~~", rb_iv100$parameter)])
 rb_300 <- max(abs(summ$rel_bias[summ$n >= 300]))
 summ$estimator <- factor(summ$estimator, levels = c("JS", "JSA", "IV", "ML"))
+ml <- with(summ, estimator == "ML" & parameter == "eta3=~y11" & n == 100 & rel == 0.6)
+
+## sensitivity check: largest change per condition when outliers are retained
+cols <- c("rel_bias", "sd", "rb_var", "coverage")
+sens <- aggregate(abs(summ[cols] - summ_all[cols]), summ[c("n", "rel")], max)
+sens$removed <- as.vector(table(scr$removed_replications$cond)[paste(sens$n, sens$rel)])
+sens <- sens[!is.na(sens$removed), c("n", "rel", "removed", cols)]
+sens <- sens[order(sens$rel, sens$n), ]
 
 ## long format over the three criteria, with MCSE bars
 crit <- c(sd = "SD", rb_var = "SE²/VAR", coverage = "Coverage")
@@ -1082,7 +1090,16 @@ reliability .6, where `r sprintf("%.1f", scr$removed_by_cond[1])`% of the
 replications were removed, flagged mainly through JS
 (`r sprintf("%.1f", scr$flagged_100_06["JS"])`% of the replications in that
 condition). In every other condition fewer than 0.5% of the replications were
-removed. Inadmissible solutions occurred in `r scr$inad` replications, all
+removed.^[As a sensitivity check, all performance measures were recomputed
+without the outlier screening, retaining all 1,500 replications of every
+condition. The conclusions did not change, with one exception. The
+SE$^2$/VAR ratio of ML for $\lambda_{11}$ at $n=100$ with reliability .6
+fell from `r sprintf("%.2f", summ$rb_var[ml])` to
+`r sprintf("%.2f", summ_all$rb_var[ml])` without screening, just below the
+acceptable range. The Appendix reports, for each condition, the largest
+difference in each performance measure with and without screening, and the
+complete unscreened measures are available in the project repository.]
+Inadmissible solutions occurred in `r scr$inad` replications, all
 for JS at $n=100$ with reliability .6, where a disturbance variance
 estimate was negative. All of them were also flagged by the outlier
 screening, so none enters the results below.
@@ -1279,3 +1296,23 @@ responsibility for the content of this article.
 
 ::: {#refs}
 :::
+
+# Sensitivity to Outlier Screening {#apx-sensitivity}
+
+@tbl-sensitivity reports, for each condition with removed replications, the
+number removed and the largest absolute change in each performance measure
+when they are retained.
+
+\newpage{}
+
+```{r}
+#| label: tbl-sensitivity
+#| tbl-cap: "Sensitivity Check"
+#| apa-note: "Removed is the number of replications out of 1,500 removed by the outlier screening. The remaining columns give, for each performance measure, the largest absolute difference across the four estimators and all estimands between the reported value and the value with the removed replications retained. Conditions without removed replications are omitted."
+tab <- sens
+tab$rel <- sub("^0", "", format(tab$rel))
+knitr::kable(tab, booktabs = TRUE, format = "latex", digits = 3,
+             row.names = FALSE, escape = FALSE,
+             col.names = c("$n$", "Reliability", "Removed", "Relative bias",
+                           "SD", "SE$^2$/VAR", "Coverage"))
+```
