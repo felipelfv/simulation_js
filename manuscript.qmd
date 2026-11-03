@@ -1011,6 +1011,10 @@ rb_iv_var <- range(rb_iv100$rel_bias[grepl("^eta[0-9]~~", rb_iv100$parameter)])
 rb_300 <- max(abs(summ$rel_bias[summ$n >= 300]))
 summ$estimator <- factor(summ$estimator, levels = c("JS", "JSA", "IV", "ML"))
 ml <- with(summ, estimator == "ML" & parameter == "eta3=~y11" & n == 100 & rel == 0.6)
+## JS slopes of the eta3 equation at reliability .6, and B31 at n = 100
+js31 <- with(summ, estimator == "JS" & parameter == "eta3~eta1" & rel == 0.6)
+js32 <- with(summ, estimator == "JS" & parameter == "eta3~eta2" & rel == 0.6)
+b31_100 <- with(summ, parameter == "eta3~eta1" & rel == 0.6 & n == 100)
 
 ## sensitivity check: largest change per condition when outliers are retained
 cols <- c("rel_bias", "sd", "rb_var", "coverage")
@@ -1128,7 +1132,7 @@ All four estimators converged in every replication of every condition.
 Outlier screening removed `r scr$removed` of the 18,000 replications
 (`r sprintf("%.2f", scr$removed_pct)`%), concentrated at $n=100$ with
 reliability .6, where `r sprintf("%.1f", scr$removed_by_cond[1])`% of the
-replications were removed, flagged mainly through JS
+replications were removed, flagged most often through JS
 (`r sprintf("%.1f", scr$flagged_100_06["JS"])`% of the replications in that
 condition). In every other condition fewer than 0.5% of the replications were
 removed.^[As a sensitivity check, all performance measures were recomputed
@@ -1140,10 +1144,7 @@ fell from `r sprintf("%.2f", summ$rb_var[ml])` to
 acceptable range. @apx-sensitivity reports, for each condition, the largest
 difference in each performance measure with and without screening, and the
 complete unscreened measures are available in the project repository.]
-Inadmissible solutions occurred in `r scr$inad` replications, all
-for JS at $n=100$ with reliability .6, where a disturbance variance
-estimate was negative. All of them were also flagged by the outlier
-screening, so none enters the results below.
+No inadmissible solutions occurred.
 
 ## Relative Bias
 
@@ -1166,7 +1167,7 @@ indicator per latent variable, and @fig-sim-factorvar the variance of $\eta_1$
 and the two disturbance variances. Omitted loadings and measurement error 
 variances behave similarly to those shown for the same latent variable, with 
 SE$^2$/VAR ratios that differ 
-by at most 0.15 and coverage by .03 in every condition. Overall, standard
+by less than 0.17 and coverage by .03 in every condition. Overall, standard
 error performance was acceptable. Across the
 `r format(nrow(summ), big.mark = ",")` combinations of
 `r length(unique(summ$parameter))` estimands, `r length(ns) * length(rels)` conditions, and
@@ -1179,26 +1180,34 @@ $n=300$ onward, the few ratios above 1.10 remained below 1.12. Three
 departures are concentrated at $n=100$ and $n=200$, mainly at reliability .6.
 
 First, JS standard errors for $B_{31}$ and $B_{32}$ exceed the acceptable
-range at reliability .6, with SE$^2$/VAR ratios of 1.5–1.6 at $n=100$ and
-1.13–1.14 at $n=200$. Coverage nonetheless exceeds .975 only for $B_{31}$ at
-$n=100$. Its SD is also the largest, 0.24 versus 0.13–0.17 at $n=100$. These
+range at $n=100$ and reliability .6, with SE$^2$/VAR ratios of
+`r sprintf("%.2f", summ$rb_var[js31 & summ$n == 100])` and
+`r sprintf("%.2f", summ$rb_var[js32 & summ$n == 100])`. Coverage nonetheless
+exceeds .975 only for $B_{31}$ at $n=100$. Its SD is also the largest,
+`r sprintf("%.2f", summ$sd[b31_100 & summ$estimator == "JS"])` versus
+`r paste(sprintf("%.2f", range(summ$sd[b31_100 & summ$estimator != "JS"])), collapse = "–")`.
+These
 patterns may reflect instability in the reliability adjustment for the
 $\eta_3$ equation. In some replications, the implied correlation between
 $\eta_1$ and $\eta_2$ approaches 1, making the fitted predictors nearly
 collinear and inflating both estimates and standard errors. Screening removed
 the most extreme cases, but milder cases remain. JSA, which aggregates
-indicators within each latent variable, shows no corresponding instability.
+indicators within each latent variable, shows only a slight excess for
+$B_{31}$ at $n=100$, with a ratio of
+`r sprintf("%.2f", summ$rb_var[b31_100 & summ$estimator == "JSA"])`.
 
 Second, MIIV loading intervals fall below the acceptable coverage range at
 reliability .6, with coverage of .88–.90 at $n=100$, compared with .93–.96 for
-the other estimators, despite SE$^2$/VAR ratios of 0.98–1.14 and the smallest
+the other estimators, despite SE$^2$/VAR ratios of
+`r paste(sprintf("%.2f", range(rb_iv100$rb_var[grepl("=~", rb_iv100$parameter)])), collapse = "–")`
+and the smallest
 SD. This discrepancy reflects the downward loading bias reported above,
 consistent with the known small-sample bias of IV estimators
 [@jin_etall_2021], which they found largest when all model-implied
 instruments are used, as here, and diminishes slowly as sample size
 increases.
 
-Third, at $n=100$ MIIV overestimates the standard errors of the latent and
+Third, at $n=100$ and reliability .6, MIIV overestimates the standard errors of the latent and
 disturbance variances, with ratios of 1.11–1.18, but its coverage rates of
 .96–.97 remain within the acceptable range. ML, in contrast, has ratios close
 to 1 but coverage rates of .91–.94 for the disturbance variances. JS and JSA
@@ -1261,12 +1270,12 @@ performed comparably to those of MIIV and ML. Both estimators were
 essentially unbiased in all conditions, and their coverage rates and
 SE$^2$/VAR ratios were acceptable from $n=300$ onward for essentially
 every parameter.
-The one notable departure concerned JS at reliability .6 and $n\le200$,
+The one notable departure concerned JS at reliability .6 and $n=100$,
 where the standard errors of the slopes in the $\eta_3$ equation were too
 large. This pattern appears to reflect instability in the reliability
 adjustment when the fitted latent predictors are nearly collinear. JSA,
-which aggregates indicators within each latent variable, showed no
-corresponding instability. These results extend those of
+which aggregates indicators within each latent variable, was much less
+affected. These results extend those of
 @burghgraeve_etall_2021, who found JS less efficient than JSA for latent
 regression estimation and JSA competitive with ML, consistent with the
 empirical standard deviations observed here. Their bootstrap standard

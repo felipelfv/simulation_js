@@ -197,8 +197,7 @@ lavaan must be version 0.7-3 or later (published on CRAN 2026-10-08). The
 which `JS` and `JSA` handle latent regressions and provide analytical standard
 errors. Earlier releases restricted them to confirmatory factor models.
 The committed results were produced with the development version 0.7-3.3364
-from GitHub, which changes the `JS` estimates in some small-sample
-replications relative to the CRAN release. To install exactly that version:
+from GitHub. To install exactly that version:
 
 ```r
 remotes::install_github("yrosseel/lavaan", ref = "ef620c8ed3cfd0cdf2821ad2c75e57bb75cf0358")
