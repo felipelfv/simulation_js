@@ -109,10 +109,13 @@ execute:
 ```{r}
 #| label: setup
 #| include: false
-library(lavaan)
-library(simhelpers)
-library(ggplot2)
-library(knitr)
+library(ggplot2); library(knitr)
+
+## software versions reported in Data and Code Availability
+lavaan_version <- packageVersion("lavaan")
+simhelpers_version <- packageVersion("simhelpers")
+ggplot2_version <- packageVersion("ggplot2")
+rix_version <- packageVersion("rix")
 ```
 
 Structural equation models (SEMs) with latent variables are usually estimated
@@ -985,8 +988,8 @@ tab <- data.frame(
            "---",
            "$\\sqrt{\\tfrac{K-1}{K}\\sum_{j=1}^{K}(\\nu_{(j)}-\\nu)^2}$",
            "$\\sqrt{c(1-c)/K}$"))
-knitr::asis_output(paste0("\\begin{center}\n",
-  knitr::kable(tab, booktabs = TRUE, escape = FALSE, longtable = TRUE,
+asis_output(paste0("\\begin{center}\n",
+  kable(tab, booktabs = TRUE, escape = FALSE, longtable = TRUE,
                linesep = "", format = "latex",
                col.names = c("Performance measure", "Empirical calculation", "MCSE")),
   "\n\\end{center}"))
@@ -1258,14 +1261,19 @@ matter most.
 
 ## Data and Code Availability
 
-\noindent All analyses were conducted in R [@rcoreteam_2026] using the
-lavaan package [@rosseel_2012] for estimation, simhelpers
+\noindent All analyses were conducted in R
+`r paste(R.version$major, R.version$minor, sep = ".")`
+[@rcoreteam_2026] using the development version `r lavaan_version` of the
+lavaan package [@rosseel_2012] for estimation, installed from the GitHub
+repository at commit ef620c8, simhelpers `r simhelpers_version`
 [@joshi_pustejovsky_2025] for performance evaluation, and ggplot2
-[@wickham_2016] for the figures. The computational environment was pinned
-with Nix [@dolstra_etall_2004] via the rix package
-[@rodrigues_baumann_2026], and a Dockerfile that builds the same
-environment inside a container is also provided. The article was written
-with the apaquarto extension [@schneider_2026]. The simulation used a single
+`r ggplot2_version` [@wickham_2016] for the figures. The computational
+environment was pinned with Nix [@dolstra_etall_2004] via the development
+version `r rix_version` of the rix package [@rodrigues_baumann_2026],
+installed from the GitHub repository at commit a08ee5c, and a Dockerfile
+that builds the same environment inside a container is also provided. The 
+article was written with the apaquarto extension [@schneider_2026]. The 
+simulation used a single
 seed with the default random number generator in R, the Mersenne Twister. We
 also highlight that all conditions and replications were run sequentially in a
 fixed order from this single seed, without parallel processing. Thus, running
@@ -1315,7 +1323,7 @@ when they are retained.
 #| apa-note: "Removed is the number of replications out of 1,500 removed by the outlier screening. The remaining columns give, for each performance measure, the largest absolute difference across the four estimators and all estimands between the reported value and the value with the removed replications retained. Conditions without removed replications are omitted."
 tab <- sens
 tab$rel <- sub("^0", "", format(tab$rel))
-knitr::kable(tab, booktabs = TRUE, format = "latex", digits = 3,
+kable(tab, booktabs = TRUE, format = "latex", digits = 3,
              row.names = FALSE, escape = FALSE,
              col.names = c("$n$", "Reliability", "Removed", "Relative bias",
                            "SD", "SE$^2$/VAR", "Coverage"))

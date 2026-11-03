@@ -21,7 +21,10 @@ rix(date = "2026-05-11", # available_dates(), 1.8.x quarto (1.9.37 has a pandoc 
     git_pkgs = list(
       list(package_name = "lavaan",
            repo_url = "https://github.com/yrosseel/lavaan",
-           commit = "ef620c8ed3cfd0cdf2821ad2c75e57bb75cf0358")   # 0.7-3.3364, 2026-11-01
+           commit = "ef620c8ed3cfd0cdf2821ad2c75e57bb75cf0358"),  # 0.7-3.3364, 2026-11-01
+      list(package_name = "rix",            # same rix that generated default.nix
+           repo_url = "https://github.com/ropensci/rix",
+           commit = "a08ee5cea4fa8ec26262d5d441ab2b79c8fedd5f")   # 0.18.6
     ),
     project_path = ".",
     overwrite = TRUE
