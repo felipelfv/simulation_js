@@ -61,9 +61,9 @@ abstract: |
   Throughout, model-implied instrumental-variable (MIIV) estimation serves as
   a point of comparison using a common notation. A simulation study compares
   the standard error accuracy of JS and JSA with that of MIIV and maximum
-  likelihood (ML) under correct model specification. The standard errors of
-  JS and JSA perform comparably to those of MIIV and ML under the conditions
-  examined.
+  likelihood (ML) for a correctly specified model with normally distributed
+  data. Under these conditions, the standard errors of JS and JSA perform
+  comparably to those of MIIV and ML.
 
 keywords: [structural equation modeling, James–Stein estimation, model-implied instrumental variables, delta method, simulation]
 
@@ -1015,6 +1015,13 @@ ml <- with(summ, estimator == "ML" & parameter == "eta3=~y11" & n == 100 & rel =
 js31 <- with(summ, estimator == "JS" & parameter == "eta3~eta1" & rel == 0.6)
 js32 <- with(summ, estimator == "JS" & parameter == "eta3~eta2" & rel == 0.6)
 b31_100 <- with(summ, parameter == "eta3~eta1" & rel == 0.6 & n == 100)
+## departures from the acceptable ranges, and a "from .. to .." range
+cov_out <- summ$coverage < .925 | summ$coverage > .975
+rb_out <- summ$rb_var < 0.90 | summ$rb_var > 1.10
+rng <- function(x, lead0 = TRUE) {
+  r <- sprintf("%.2f", range(x))
+  paste(if (lead0) r else sub("^0", "", r), collapse = " to ")
+}
 
 ## sensitivity check: largest change per condition when outliers are retained
 cols <- c("rel_bias", "sd", "rb_var", "coverage")
@@ -1175,9 +1182,17 @@ error performance was acceptable. Across the
 `r sprintf("%.1f", 100 * mean(summ$coverage >=.925 & summ$coverage <= .975))`% 
 of coverage rates fell between .925 and .975
 and `r sprintf("%.1f", 100 * mean(summ$rb_var >= .90 & summ$rb_var <= 1.10))`%
-of SE$^2$/VAR ratios between 0.90 and 1.10, with no ratio below 0.90. From
-$n=300$ onward, the few ratios above 1.10 remained below 1.12. Three
-departures are concentrated at $n=100$ and $n=200$, mainly at reliability .6.
+of SE$^2$/VAR ratios between 0.90 and 1.10. Coverage ranged from
+`r rng(summ$coverage, lead0 = FALSE)` and the ratios from
+`r rng(summ$rb_var)`. All `r sum(rb_out)` ratios outside the band exceeded
+1.10, and of the `r sum(cov_out)` coverage rates outside the band only
+`r sum(summ$coverage > .975)` exceeded .975, the remaining
+`r sum(summ$coverage < .925)` falling below .925. Of these,
+`r sum(rb_out & summ$n <= 200)` ratios and `r sum(cov_out & summ$n <= 200)`
+coverage rates occurred at $n=100$ or $n=200$. From $n=300$ onward, coverage
+ranged from `r rng(summ$coverage[summ$n >= 300], lead0 = FALSE)` and the
+ratios from `r rng(summ$rb_var[summ$n >= 300])`. Three departures are
+concentrated at $n=100$ and $n=200$, mainly at reliability .6.
 
 First, JS standard errors for $B_{31}$ and $B_{32}$ exceed the acceptable
 range at $n=100$ and reliability .6, with SE$^2$/VAR ratios of
@@ -1186,12 +1201,9 @@ range at $n=100$ and reliability .6, with SE$^2$/VAR ratios of
 exceeds .975 only for $B_{31}$ at $n=100$. Its SD is also the largest,
 `r sprintf("%.2f", summ$sd[b31_100 & summ$estimator == "JS"])` versus
 `r paste(sprintf("%.2f", range(summ$sd[b31_100 & summ$estimator != "JS"])), collapse = "–")`.
-These
-patterns may reflect instability in the reliability adjustment for the
-$\eta_3$ equation. In some replications, the implied correlation between
-$\eta_1$ and $\eta_2$ approaches 1, making the fitted predictors nearly
-collinear and inflating both estimates and standard errors. Screening removed
-the most extreme cases, but milder cases remain. JSA, which aggregates
+Both slopes belong to the $\eta_3$ equation, the only equation with two
+latent predictors, and the departure is confined to the lowest reliability
+and the smallest sample size. JSA, which aggregates
 indicators within each latent variable, shows only a slight excess for
 $B_{31}$ at $n=100$, with a ratio of
 `r sprintf("%.2f", summ$rb_var[b31_100 & summ$estimator == "JSA"])`.
@@ -1265,17 +1277,19 @@ analytical standard errors for JS and JSA by applying the delta method to the
 complete estimation procedure. A reproducible simulation study then evaluated 
 their accuracy against MIIV and ML under correct model specification.
 
-The main finding is that the analytical standard errors of JS and JSA
+The main finding is that, for a correctly specified recursive model with
+normally distributed data, the analytical standard errors of JS and JSA
 performed comparably to those of MIIV and ML. Both estimators were
 essentially unbiased in all conditions, and their coverage rates and
 SE$^2$/VAR ratios were acceptable from $n=300$ onward for essentially
 every parameter.
 The one notable departure concerned JS at reliability .6 and $n=100$,
 where the standard errors of the slopes in the $\eta_3$ equation were too
-large. This pattern appears to reflect instability in the reliability
-adjustment when the fitted latent predictors are nearly collinear. JSA,
+large. This departure was confined to the equation with two latent
+predictors. JSA,
 which aggregates indicators within each latent variable, was much less
-affected. These results extend those of
+affected. In small samples with low reliability, JSA is therefore
+preferable to JS. These results extend those of
 @burghgraeve_etall_2021, who found JS less efficient than JSA for latent
 regression estimation and JSA competitive with ML, consistent with the
 empirical standard deviations observed here. Their bootstrap standard
