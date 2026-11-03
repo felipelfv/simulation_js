@@ -1345,15 +1345,14 @@ responsibility for the content of this article.
 number removed and the largest absolute change in each performance measure
 when they are retained.
 
-\newpage{}
-
 ```{r}
 #| label: tbl-sensitivity
 #| tbl-cap: "Sensitivity Check"
+#| apa-longtable: true
 #| apa-note: "Removed is the number of replications out of 1,500 removed by the outlier screening. The remaining columns give, for each performance measure, the largest absolute difference across the four estimators and all estimands between the reported value and the value with the removed replications retained. Conditions without removed replications are omitted."
 tab <- sens
 tab$rel <- sub("^0", "", format(tab$rel))
-kable(tab, booktabs = TRUE, format = "latex", digits = 3,
+kable(tab, booktabs = TRUE, format = "latex", digits = 3, longtable = TRUE,
              row.names = FALSE, escape = FALSE,
              col.names = c("$n$", "Reliability", "Removed", "Relative bias",
                            "SD", "SE$^2$/VAR", "Coverage"))
