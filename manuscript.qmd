@@ -969,10 +969,11 @@ available, is shown in the figures.
 Coverage between .925 and .975 and SE$^2$/VAR ratios between 0.90 and 1.10
 were considered acceptable.
 
-We also note that, although the evaluation targets the standard errors, 
-the relative bias of the estimates was also computed, because standard errors 
-of markedly biased estimates are of limited use for inference. It is reported 
-in the text, but not in the figures.
+We also note that, although the evaluation is focused on the standard errors,
+the relative bias of the estimates was also computed, as standard errors of
+biased estimates are of limited use for inference. It is reported in the text,
+but not in the figures. For complete tables of all measures and their MCSEs,
+we refer the reader to @apx-tables.
 
 ```{r}
 #| label: tbl-performance
@@ -1082,6 +1083,33 @@ lab_res   <- c("theta[1]", "theta[2]", "theta[5]", "theta[6]", "theta[9]",
                "theta[10]")
 pars_fvar <- c("eta1~~eta1", "eta2~~eta2", "eta3~~eta3")
 lab_fvar  <- c("Var(eta[1])", "Var(zeta[2])", "Var(zeta[3])")
+
+## appendix tables: one performance measure at one reliability, with the
+## estimands of the figures by estimator as rows and the sample sizes as
+## columns, MCSE in parentheses
+pars_tab <- c(pars_coef, pars_load, pars_res, pars_fvar)
+lab_tab  <- c("$B_{21}$", "$B_{31}$", "$B_{32}$",
+              "$\\lambda_2$", "$\\lambda_6$", "$\\lambda_{10}$",
+              "$\\theta_1$", "$\\theta_2$", "$\\theta_5$", "$\\theta_6$",
+              "$\\theta_9$", "$\\theta_{10}$",
+              "$\\mathrm{Var}(\\eta_1)$", "$\\mathrm{Var}(\\zeta_2)$",
+              "$\\mathrm{Var}(\\zeta_3)$")
+perf_table <- function(measure, rel, digits, scale = 1) {
+  v <- summ[summ$parameter %in% pars_tab & summ$rel == rel, ]
+  v$parameter <- factor(v$parameter, levels = pars_tab)
+  cell <- sprintf(paste0("%.", digits, "f (%.", digits, "f)"),
+                  round(scale * v[[measure]], digits) + 0,   # + 0 avoids "-0.0"
+                  scale * v[[paste0(measure, "_mcse")]])
+  if (measure == "coverage") cell <- gsub("0\\.", ".", cell)
+  tab <- tapply(cell, v[c("estimator", "parameter", "n")], identity)
+  dim(tab) <- c(length(cell) / length(ns), length(ns))  # estimator within estimand
+  tab <- data.frame(c(rbind(lab_tab, "", "", "")), c("JS", "JSA", "MIIV", "ML"), tab)
+  asis_output(paste0("\\begingroup\\scriptsize\\renewcommand{\\arraystretch}{0.85}\n",
+    kable(tab, booktabs = TRUE, escape = FALSE, longtable = TRUE, format = "latex",
+          align = c("l", "l", rep("r", 6)), linesep = c("", "", "", "\\addlinespace[2pt]"),
+          col.names = c("Estimand", "Estimator", paste0("$n=", ns, "$"))),
+    "\n\\endgroup"))
+}
 ```
 
 # Results
@@ -1101,7 +1129,7 @@ condition. The conclusions did not change, with one exception. The
 SE$^2$/VAR ratio of ML for $\lambda_{11}$ at $n=100$ with reliability .6
 fell from `r sprintf("%.2f", summ$rb_var[ml])` to
 `r sprintf("%.2f", summ_all$rb_var[ml])` without screening, just below the
-acceptable range. The Appendix reports, for each condition, the largest
+acceptable range. @apx-sensitivity reports, for each condition, the largest
 difference in each performance measure with and without screening, and the
 complete unscreened measures are available in the project repository.]
 Inadmissible solutions occurred in `r scr$inad` replications, all
@@ -1329,4 +1357,92 @@ kable(tab, booktabs = TRUE, format = "latex", digits = 3,
              row.names = FALSE, escape = FALSE,
              col.names = c("$n$", "Reliability", "Removed", "Relative bias",
                            "SD", "SE$^2$/VAR", "Coverage"))
+```
+
+\newpage{}
+
+# Complete Performance Measures {#apx-tables}
+
+@tbl-rb-6 to @tbl-cov-8 report, for each performance measure and reliability,
+the values for every estimator, sample size, and estimand shown in the figures,
+with the MCSE in parentheses.
+
+\newpage{}
+
+```{r}
+#| label: tbl-rb-6
+#| tbl-cap: "Relative Bias (%) at Reliability .6"
+#| apa-longtable: true
+#| apa-note: "Monte Carlo standard errors in parentheses. JS = scaling James–Stein, JSA = aggregated James–Stein, MIIV = model-implied instrumental variable, ML = maximum likelihood."
+perf_table("rel_bias", 0.6, 1, 100)
+```
+
+\newpage{}
+
+```{r}
+#| label: tbl-rb-8
+#| tbl-cap: "Relative Bias (%) at Reliability .8"
+#| apa-longtable: true
+#| apa-note: "Monte Carlo standard errors in parentheses. JS = scaling James–Stein, JSA = aggregated James–Stein, MIIV = model-implied instrumental variable, ML = maximum likelihood."
+perf_table("rel_bias", 0.8, 1, 100)
+```
+
+\newpage{}
+
+```{r}
+#| label: tbl-sd-6
+#| tbl-cap: "Empirical Standard Deviation at Reliability .6"
+#| apa-longtable: true
+#| apa-note: "Monte Carlo standard errors in parentheses. JS = scaling James–Stein, JSA = aggregated James–Stein, MIIV = model-implied instrumental variable, ML = maximum likelihood."
+perf_table("sd", 0.6, 4)
+```
+
+\newpage{}
+
+```{r}
+#| label: tbl-sd-8
+#| tbl-cap: "Empirical Standard Deviation at Reliability .8"
+#| apa-longtable: true
+#| apa-note: "Monte Carlo standard errors in parentheses. JS = scaling James–Stein, JSA = aggregated James–Stein, MIIV = model-implied instrumental variable, ML = maximum likelihood."
+perf_table("sd", 0.8, 4)
+```
+
+\newpage{}
+
+```{r}
+#| label: tbl-ratio-6
+#| tbl-cap: "SE$^2$/VAR Ratio at Reliability .6"
+#| apa-longtable: true
+#| apa-note: "Monte Carlo standard errors in parentheses. JS = scaling James–Stein, JSA = aggregated James–Stein, MIIV = model-implied instrumental variable, ML = maximum likelihood."
+perf_table("rb_var", 0.6, 2)
+```
+
+\newpage{}
+
+```{r}
+#| label: tbl-ratio-8
+#| tbl-cap: "SE$^2$/VAR Ratio at Reliability .8"
+#| apa-longtable: true
+#| apa-note: "Monte Carlo standard errors in parentheses. JS = scaling James–Stein, JSA = aggregated James–Stein, MIIV = model-implied instrumental variable, ML = maximum likelihood."
+perf_table("rb_var", 0.8, 2)
+```
+
+\newpage{}
+
+```{r}
+#| label: tbl-cov-6
+#| tbl-cap: "Coverage at Reliability .6"
+#| apa-longtable: true
+#| apa-note: "Monte Carlo standard errors in parentheses. JS = scaling James–Stein, JSA = aggregated James–Stein, MIIV = model-implied instrumental variable, ML = maximum likelihood."
+perf_table("coverage", 0.6, 3)
+```
+
+\newpage{}
+
+```{r}
+#| label: tbl-cov-8
+#| tbl-cap: "Coverage at Reliability .8"
+#| apa-longtable: true
+#| apa-note: "Monte Carlo standard errors in parentheses. JS = scaling James–Stein, JSA = aggregated James–Stein, MIIV = model-implied instrumental variable, ML = maximum likelihood."
+perf_table("coverage", 0.8, 3)
 ```
