@@ -1266,7 +1266,11 @@ with Nix [@dolstra_etall_2004] via the rix package
 [@rodrigues_baumann_2026], and a Dockerfile that builds the same
 environment inside a container is also provided. The article was written
 with the apaquarto extension [@schneider_2026]. The simulation used a single
-seed with R's default random number generator, the Mersenne Twister. All code,
+seed with the default random number generator in R, the Mersenne Twister. We
+also highlight that all conditions and replications were run sequentially in a
+fixed order from this single seed, without parallel processing. Thus, running
+the simulation within the pinned environment reproduces the stored results, as
+long as the sequential execution is not changed. All code,
 simulation results, and the manuscript source, together with a description of 
 all files and instructions to reproduce the simulation study and the
 manuscript, are archived on Zenodo at <https://doi.org/10.5281/zenodo.23730879>.
