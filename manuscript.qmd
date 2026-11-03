@@ -1031,36 +1031,44 @@ long$rel <- factor(long$rel, levels = rels,
 long$lower <- long$value - long$mcse
 long$upper <- long$value + long$mcse
 
-## SE²/VAR values above `cap` are drawn at `cap` with an open triangle and no bar
-cap <- 1.5
-i <- long$criterion == "SE²/VAR"
-long$clipped <- i & long$value > cap
-long$value[long$clipped] <- cap
-long$upper[i] <- pmin(long$upper[i], cap)
-long$lower[long$clipped] <- long$upper[long$clipped] <- NA
-
-ref <- data.frame(criterion = factor(c("SE²/VAR", "Coverage"), levels = crit),
-                  y = c(1, 0.95))
+## reference value and acceptable range of the SE²/VAR and coverage rows
+band <- data.frame(criterion = factor(c("SE²/VAR", "Coverage"), levels = crit),
+                   ref = c(1, 0.95), lower = c(0.90, 0.925),
+                   upper = c(1.10, 0.975))
+## y-axis limits shared by all figures for SE²/VAR and coverage: the band and
+## every error bar
+lim <- do.call(rbind, lapply(1:2, function(i) {
+  k <- long$criterion == band$criterion[i]
+  data.frame(criterion = band$criterion[i], n = ns[1],
+             value = range(band$lower[i], band$upper[i], long$lower[k],
+                           long$upper[k]))
+}))
+okabe <- palette.colors(palette = "Okabe-Ito", names = TRUE)
 pd <- position_dodge(width = 25)
 
 plot_params <- function(pars, labels, breaks = ns) {
   v <- long[long$parameter %in% pars, ]
   v$parameter <- factor(v$parameter, levels = pars, labels = labels)
+  k <- v$criterion == "SD"   # SD limits shared within the figure
+  lim_sd <- data.frame(criterion = "SD", n = ns[1],
+                       value = range(v$lower[k], v$upper[k]))
   ggplot(v, aes(n, value, colour = estimator, shape = estimator,
                 linetype = estimator)) +
-    geom_hline(data = ref, aes(yintercept = y), colour = "grey55",
+    geom_rect(data = band, aes(ymin = lower, ymax = upper), xmin = -Inf,
+              xmax = Inf, fill = "grey92", inherit.aes = FALSE) +
+    geom_blank(data = rbind(lim, lim_sd), aes(n, value), inherit.aes = FALSE) +
+    geom_hline(data = band, aes(yintercept = ref), colour = "grey55",
                linetype = "dotted") +
     geom_errorbar(aes(ymin = lower, ymax = upper), width = 0,
-                  linetype = "solid", position = pd, na.rm = TRUE) +
+                  linetype = "solid", position = pd) +
     geom_line(linewidth = 0.5, position = pd) +
     geom_point(size = 2, position = pd) +
-    geom_point(data = v[v$clipped, ], shape = 2, size = 3, position = pd,
-               show.legend = FALSE) +
     facet_grid(rel + criterion ~ parameter, scales = "free_y", switch = "y",
                labeller = labeller(parameter = label_parsed)) +
     scale_x_continuous(breaks = breaks) +
-    scale_colour_manual(values = c(JS = "#2a78d6", JSA = "#eda100",
-                                   IV = "#eb6834", ML = "#1baf7a")) +
+    scale_colour_manual(values = c(JS = okabe[["blue"]], JSA = okabe[["orange"]],
+                                   IV = okabe[["vermillion"]],
+                                   ML = okabe[["bluishgreen"]])) +
     scale_shape_manual(values = c(JS = 16, JSA = 18, IV = 15, ML = 17)) +
     scale_linetype_manual(values = c(JS = "solid", JSA = "dashed",
                                      IV = "longdash", ML = "dotdash")) +
@@ -1159,8 +1167,10 @@ and the two disturbance variances. Omitted loadings and measurement error
 variances behave similarly to those shown for the same latent variable, with 
 SE$^2$/VAR ratios that differ 
 by at most 0.15 and coverage by .03 in every condition. Overall, standard
-error performance was acceptable. Across all conditions,
-estimators, and parameters, 
+error performance was acceptable. Across the
+`r format(nrow(summ), big.mark = ",")` combinations of
+`r length(unique(summ$parameter))` estimands, `r length(ns) * length(rels)` conditions, and
+`r nlevels(summ$estimator)` estimators,
 `r sprintf("%.1f", 100 * mean(summ$coverage >=.925 & summ$coverage <= .975))`% 
 of coverage rates fell between .925 and .975
 and `r sprintf("%.1f", 100 * mean(summ$rb_var >= .90 & summ$rb_var <= 1.10))`%
@@ -1200,7 +1210,7 @@ from .91 to .96 across estimators and a common dip at $n=100$.
 ```{r}
 #| label: fig-sim-structural
 #| fig-cap: "Performance of the Standard Errors of the Latent Regression Slopes"
-#| apa-note: "NoNote *Note.* JS = scaling James–Stein, JSA = aggregated James–Stein, IV = MIIV, ML = maximum likelihood. Dotted lines mark the reference values 1 and .95. Error bars represent Monte Carlo standard errors. Values above 1.5 are drawn at 1.5 with an open triangle."
+#| apa-note: "NoNote *Note.* JS = scaling James–Stein, JSA = aggregated James–Stein, IV = MIIV, ML = maximum likelihood. Dotted lines mark the reference values 1 and .95, and shaded bands the acceptable ranges of 0.90 to 1.10 and .925 to .975. Error bars represent Monte Carlo standard errors."
 #| fig-width: 6.5
 #| fig-height: 8.5
 #| out-width: "100%"
@@ -1210,7 +1220,7 @@ plot_params(pars_coef, lab_coef)
 ```{r}
 #| label: fig-sim-loadings
 #| fig-cap: "Performance of the Standard Errors of One Factor Loading per Latent Variable"
-#| apa-note: "NoNote *Note.* JS = scaling James–Stein, JSA = aggregated James–Stein, IV = MIIV, ML = maximum likelihood. Dotted lines mark the reference values 1 and .95. Error bars represent Monte Carlo standard errors."
+#| apa-note: "NoNote *Note.* JS = scaling James–Stein, JSA = aggregated James–Stein, IV = MIIV, ML = maximum likelihood. Dotted lines mark the reference values 1 and .95, and shaded bands the acceptable ranges of 0.90 to 1.10 and .925 to .975. Error bars represent Monte Carlo standard errors."
 #| fig-width: 6.5
 #| fig-height: 8.5
 #| out-width: "100%"
@@ -1220,7 +1230,7 @@ plot_params(pars_load, lab_load)
 ```{r}
 #| label: fig-sim-residual
 #| fig-cap: "Performance of the Standard Errors of the Measurement Error Variances of the Scaling Indicator and One Nonscaling Indicator per Latent Variable"
-#| apa-note: "NoNote *Note.* JS = scaling James–Stein, JSA = aggregated James–Stein, IV = MIIV, ML = maximum likelihood. Dotted lines mark the reference values 1 and .95. Error bars represent Monte Carlo standard errors."
+#| apa-note: "NoNote *Note.* JS = scaling James–Stein, JSA = aggregated James–Stein, IV = MIIV, ML = maximum likelihood. Dotted lines mark the reference values 1 and .95, and shaded bands the acceptable ranges of 0.90 to 1.10 and .925 to .975. Error bars represent Monte Carlo standard errors."
 #| fig-width: 6.5
 #| fig-height: 8.5
 #| out-width: "100%"
@@ -1230,7 +1240,7 @@ plot_params(pars_res, lab_res, breaks = c(100, 300, 500))
 ```{r}
 #| label: fig-sim-factorvar
 #| fig-cap: "Performance of the Standard Errors of the Latent and Disturbance Variances"
-#| apa-note: "NoNote *Note.* JS = scaling James–Stein, JSA = aggregated James–Stein, IV = MIIV, ML = maximum likelihood. Dotted lines mark the reference values 1 and .95. Error bars represent Monte Carlo standard errors."
+#| apa-note: "NoNote *Note.* JS = scaling James–Stein, JSA = aggregated James–Stein, IV = MIIV, ML = maximum likelihood. Dotted lines mark the reference values 1 and .95, and shaded bands the acceptable ranges of 0.90 to 1.10 and .925 to .975. Error bars represent Monte Carlo standard errors."
 #| fig-width: 6.5
 #| fig-height: 8.5
 #| out-width: "100%"
