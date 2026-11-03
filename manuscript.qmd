@@ -916,10 +916,12 @@ conditions of @burghgraeve_etall_2021, as mentioned before, and determine the
 size of the reliability adjustment in JS and JSA. 
 
 With respect to the estimation approaches, JS, JSA, MIIV, and ML were
-applied as implemented in lavaan, with a mean structure and the default
-settings of each estimator. For MIIV, each equation used all instruments
-implied by the model [@bollen_bauer_2004], and its standard errors are
-those of the default implementation.
+applied as implemented in lavaan with the default options. In particular,
+$\boldsymbol\Gamma$ was estimated under normal theory with the fitted
+covariance matrix for all parameters in JS and JSA and for the (residual)
+variance, covariance, and intercept parameters in MIIV. For MIIV, each
+equation used all instruments implied by the model [@bollen_bauer_2004]. For
+ML, the standard errors were based on the expected Fisher information matrix.
 
 ### Data Generation
 
