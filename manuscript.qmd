@@ -1164,8 +1164,9 @@ and the two disturbance variances. Omitted loadings and measurement error
 variances behave similarly to those shown for the same latent variable, with 
 SE$^2$/VAR ratios that differ
 by less than `r spread("rb_var")` and coverage by
-`r spread("coverage", lead0 = FALSE)` in every condition. Overall, standard
-error performance was acceptable. Across the
+`r spread("coverage", lead0 = FALSE)` in every condition.
+
+Overall, standard error performance was acceptable. Across the
 `r format(nrow(summ), big.mark = ",")` combinations of
 `r length(unique(summ$parameter))` estimands, `r length(ns) * length(rels)` 
 conditions, and
@@ -1176,13 +1177,12 @@ of SE$^2$/VAR ratios between 0.90 and 1.10. Coverage ranged from
 `r rng(summ$coverage, lead0 = FALSE)` and the ratios from
 `r rng(summ$rb_var)`. All `r sum(rb_out)` ratios outside the acceptable
 range exceeded 1.10, and of the `r sum(cov_out)` coverage rates outside it only
-`r sum(summ$coverage > .975)` exceeded .975, the remaining
-`r sum(summ$coverage < .925)` falling below .925. Of these,
+`r sum(summ$coverage > .975)` exceeded .975. Of these,
 `r sum(rb_out & summ$n <= 200)` ratios and `r sum(cov_out & summ$n <= 200)`
 coverage rates occurred at $n=100$ or $n=200$. From $n=300$ onward, coverage
 ranged from `r rng(summ$coverage[summ$n >= 300], lead0 = FALSE)` and the
-ratios from `r rng(summ$rb_var[summ$n >= 300])`. Three departures are
-concentrated at $n=100$ and $n=200$.
+ratios from `r rng(summ$rb_var[summ$n >= 300])`. Three patterns account
+for most of these departures.
 
 First, JS standard errors for $B_{31}$ and $B_{32}$ exceed the acceptable
 range at $n=100$ and reliability .6, with SE$^2$/VAR ratios of
@@ -1308,8 +1308,8 @@ $n=100$, with loading bias and undercoverage, alongside inflated standard
 errors for latent and disturbance variances. JS and JSA showed neither the
 loading bias nor the undercoverage in these conditions.
 
-With this article and its simulation, we did not intend to compare the
-approaches exhaustively. Given that JS and JSA have received little
+With this article and its simulation, however, we did not intend to compare
+the approaches exhaustively. Given that JS and JSA have received little
 attention so far, our aim was to show what they share with MIIV and that
 both can perform comparably to ML. We hope this encourages further
 evaluation of JS and JSA across a broader range of conditions, including
