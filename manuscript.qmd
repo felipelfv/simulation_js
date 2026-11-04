@@ -1051,7 +1051,7 @@ plot_params <- function(pars, labels, breaks = ns) {
                linetype = "dotted") +
     geom_errorbar(aes(ymin = lower, ymax = upper), width = 0,
                   linetype = "solid", position = pd) +
-    geom_line(linewidth = 0.5, position = pd) +
+    geom_line(position = pd) +
     geom_point(size = 2, position = pd) +
     facet_grid(rel + criterion ~ parameter, scales = "free_y", switch = "y",
                labeller = labeller(parameter = label_parsed)) +
@@ -1234,7 +1234,6 @@ dip at $n=100$.
 #| apa-note: "NoNote *Note.* JS = scaling James–Stein, JSA = aggregated James–Stein, MIIV = model-implied instrumental variable, ML = maximum likelihood. Dotted lines mark the reference values 1 and .95, and shaded bands the acceptable ranges of 0.90 to 1.10 and .925 to .975. Error bars represent Monte Carlo standard errors."
 #| fig-width: 6.5
 #| fig-height: 8.5
-#| out-width: "100%"
 plot_params(pars_coef, lab_coef)
 ```
 
@@ -1244,7 +1243,6 @@ plot_params(pars_coef, lab_coef)
 #| apa-note: "NoNote *Note.* JS = scaling James–Stein, JSA = aggregated James–Stein, MIIV = model-implied instrumental variable, ML = maximum likelihood. Dotted lines mark the reference values 1 and .95, and shaded bands the acceptable ranges of 0.90 to 1.10 and .925 to .975. Error bars represent Monte Carlo standard errors."
 #| fig-width: 6.5
 #| fig-height: 8.5
-#| out-width: "100%"
 plot_params(pars_load, lab_load)
 ```
 
@@ -1254,7 +1252,6 @@ plot_params(pars_load, lab_load)
 #| apa-note: "NoNote *Note.* JS = scaling James–Stein, JSA = aggregated James–Stein, MIIV = model-implied instrumental variable, ML = maximum likelihood. Dotted lines mark the reference values 1 and .95, and shaded bands the acceptable ranges of 0.90 to 1.10 and .925 to .975. Error bars represent Monte Carlo standard errors."
 #| fig-width: 6.5
 #| fig-height: 8.5
-#| out-width: "100%"
 plot_params(pars_res, lab_res, breaks = c(100, 300, 500))
 ```
 
@@ -1264,7 +1261,6 @@ plot_params(pars_res, lab_res, breaks = c(100, 300, 500))
 #| apa-note: "NoNote *Note.* JS = scaling James–Stein, JSA = aggregated James–Stein, MIIV = model-implied instrumental variable, ML = maximum likelihood. Dotted lines mark the reference values 1 and .95, and shaded bands the acceptable ranges of 0.90 to 1.10 and .925 to .975. Error bars represent Monte Carlo standard errors."
 #| fig-width: 6.5
 #| fig-height: 8.5
-#| out-width: "100%"
 plot_params(pars_fvar, lab_fvar)
 ```
 
@@ -1389,7 +1385,6 @@ cols <- c("rel_bias", "sd", "rb_var", "coverage")
 sens <- aggregate(abs(summ[cols] - summ_all[cols]), summ[c("n", "rel")], max)
 sens$removed <- as.vector(table(scr$removed_replications$cond)[paste(sens$n, sens$rel)])
 sens <- sens[!is.na(sens$removed), c("n", "rel", "removed", cols)]
-sens <- sens[order(sens$rel, sens$n), ]
 sens$rel <- sub("^0", "", format(sens$rel))
 kable(sens, booktabs = TRUE, format = "latex", digits = 3, longtable = TRUE,
       row.names = FALSE, escape = FALSE,
@@ -1429,7 +1424,7 @@ perf_table <- function(measure, rel, digits, scale = 1) {
   tab <- data.frame(c(rbind(lab_tab, "", "", "")), levels(summ$estimator), tab)
   asis_output(paste0("\\begingroup\\scriptsize\\renewcommand{\\arraystretch}{0.85}\n",
     kable(tab, booktabs = TRUE, escape = FALSE, longtable = TRUE, format = "latex",
-          align = c("l", "l", rep("r", 6)), linesep = c("", "", "", "\\addlinespace[2pt]"),
+          align = c("l", "l", rep("r", length(ns))), linesep = c("", "", "", "\\addlinespace[2pt]"),
           col.names = c("Estimand", "Estimator", paste0("$n=", ns, "$"))),
     "\n\\endgroup"))
 }
