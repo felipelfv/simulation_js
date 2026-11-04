@@ -1001,36 +1001,12 @@ asis_output(paste0("\\begin{center}\n",
 ```{r}
 #| label: performance
 source("performance_calculation.R")
-
-## quantities reported inline in the results text
-pct <- function(x) sprintf("%.1f", 100 * x)
-rb_other <- max(abs(summ$rel_bias[summ$estimator != "IV"]))
-rb_iv100 <- summ[summ$estimator == "IV" & summ$n == 100 & summ$rel == 0.6, ]
-rb_iv_load <- range(-rb_iv100$rel_bias[grepl("=~", rb_iv100$parameter)])
-rb_iv_var <- range(rb_iv100$rel_bias[grepl("^eta[0-9]~~", rb_iv100$parameter)])
-rb_300 <- max(abs(summ$rel_bias[summ$n >= 300]))
 summ$estimator <- factor(summ$estimator, levels = c("JS", "JSA", "IV", "ML"))
-ml <- with(summ, estimator == "ML" & parameter == "eta3=~y11" & n == 100 & rel == 0.6)
-## JS slopes of the eta3 equation at reliability .6, and B31 at n = 100
-js31 <- with(summ, estimator == "JS" & parameter == "eta3~eta1" & rel == 0.6)
-js32 <- with(summ, estimator == "JS" & parameter == "eta3~eta2" & rel == 0.6)
-b31_100 <- with(summ, parameter == "eta3~eta1" & rel == 0.6 & n == 100)
-## departures from the acceptable ranges, and a "from .. to .." range
-cov_out <- summ$coverage < .925 | summ$coverage > .975
-rb_out <- summ$rb_var < 0.90 | summ$rb_var > 1.10
-rng <- function(x, lead0 = TRUE) {
-  r <- sprintf("%.2f", range(x))
-  paste(if (lead0) r else sub("^0", "", r), collapse = " to ")
-}
+```
 
-## sensitivity check: largest change per condition when outliers are retained
-cols <- c("rel_bias", "sd", "rb_var", "coverage")
-sens <- aggregate(abs(summ[cols] - summ_all[cols]), summ[c("n", "rel")], max)
-sens$removed <- as.vector(table(scr$removed_replications$cond)[paste(sens$n, sens$rel)])
-sens <- sens[!is.na(sens$removed), c("n", "rel", "removed", cols)]
-sens <- sens[order(sens$rel, sens$n), ]
-
-## long format over the three criteria, with MCSE bars
+```{r}
+#| label: figures
+## performance measures in long format over the three criteria, with MCSE bars
 crit <- c(sd = "SD", rb_var = "SE²/VAR", coverage = "Coverage")
 long <- do.call(rbind, lapply(names(crit), function(k)
   data.frame(summ[c("n", "rel", "estimator", "parameter")],
@@ -1046,6 +1022,7 @@ long$upper <- long$value + long$mcse
 band <- data.frame(criterion = factor(c("SE²/VAR", "Coverage"), levels = crit),
                    ref = c(1, 0.95), lower = c(0.90, 0.925),
                    upper = c(1.10, 0.975))
+
 ## y-axis limits shared by all figures for SE²/VAR and coverage: the band and
 ## every error bar
 lim <- do.call(rbind, lapply(1:2, function(i) {
@@ -1054,9 +1031,10 @@ lim <- do.call(rbind, lapply(1:2, function(i) {
              value = range(band$lower[i], band$upper[i], long$lower[k],
                            long$upper[k]))
 }))
+
+## one figure: a set of estimands as columns, reliability by criterion as rows
 okabe <- palette.colors(palette = "Okabe-Ito", names = TRUE)
 pd <- position_dodge(width = 25)
-
 plot_params <- function(pars, labels, breaks = ns) {
   v <- long[long$parameter %in% pars, ]
   v$parameter <- factor(v$parameter, levels = pars, labels = labels)
@@ -1102,32 +1080,42 @@ lab_res   <- c("theta[1]", "theta[2]", "theta[5]", "theta[6]", "theta[9]",
                "theta[10]")
 pars_fvar <- c("eta1~~eta1", "eta2~~eta2", "eta3~~eta3")
 lab_fvar  <- c("Var(eta[1])", "Var(zeta[2])", "Var(zeta[3])")
+```
 
-## appendix tables: one performance measure at one reliability, with the
-## estimands of the figures by estimator as rows and the sample sizes as
-## columns, MCSE in parentheses
-pars_tab <- c(pars_coef, pars_load, pars_res, pars_fvar)
-lab_tab  <- c("$B_{21}$", "$B_{31}$", "$B_{32}$",
-              "$\\lambda_2$", "$\\lambda_6$", "$\\lambda_{10}$",
-              "$\\theta_1$", "$\\theta_2$", "$\\theta_5$", "$\\theta_6$",
-              "$\\theta_9$", "$\\theta_{10}$",
-              "$\\mathrm{Var}(\\eta_1)$", "$\\mathrm{Var}(\\zeta_2)$",
-              "$\\mathrm{Var}(\\zeta_3)$")
-perf_table <- function(measure, rel, digits, scale = 1) {
-  v <- summ[summ$parameter %in% pars_tab & summ$rel == rel, ]
-  v$parameter <- factor(v$parameter, levels = pars_tab)
-  cell <- sprintf(paste0("%.", digits, "f (%.", digits, "f)"),
-                  round(scale * v[[measure]], digits) + 0,   # + 0 avoids "-0.0"
-                  scale * v[[paste0(measure, "_mcse")]])
-  if (measure == "coverage") cell <- gsub("0\\.", ".", cell)
-  tab <- tapply(cell, v[c("estimator", "parameter", "n")], identity)
-  dim(tab) <- c(length(cell) / length(ns), length(ns))  # estimator within estimand
-  tab <- data.frame(c(rbind(lab_tab, "", "", "")), c("JS", "JSA", "MIIV", "ML"), tab)
-  asis_output(paste0("\\begingroup\\scriptsize\\renewcommand{\\arraystretch}{0.85}\n",
-    kable(tab, booktabs = TRUE, escape = FALSE, longtable = TRUE, format = "latex",
-          align = c("l", "l", rep("r", 6)), linesep = c("", "", "", "\\addlinespace[2pt]"),
-          col.names = c("Estimand", "Estimator", paste0("$n=", ns, "$"))),
-    "\n\\endgroup"))
+```{r}
+#| label: results-values
+## values reported inline in the results text
+
+## formats: a value, a range, and a proportion as a percentage
+num <- function(x, digits = 2, scale = 1, lead0 = TRUE) {
+  r <- sprintf(paste0("%.", digits, "f"), scale * x)
+  if (lead0) r else sub("^0", "", r)
+}
+rng <- function(x, ..., sep = " to ") paste(num(range(x), ...), collapse = sep)
+pct <- function(x) num(x, 1, 100)
+
+## row selections of summ by estimator, parameter, and condition
+est   <- function(e) summ$estimator == e
+param <- function(p) summ$parameter == p
+c100  <- summ$n == 100 & summ$rel == 0.6 # smallest n, lowest reliability
+lam   <- grepl("=~", summ$parameter)   
+theta <- grepl("^y", summ$parameter)    
+fvar  <- grepl("^eta[0-9]~~", summ$parameter)   
+b31   <- param("eta3~eta1") & c100
+
+## values outside the acceptable ranges
+cov_out <- summ$coverage < .925 | summ$coverage > .975
+rb_out  <- summ$rb_var < 0.90 | summ$rb_var > 1.10
+
+## largest spread of a measure among the loadings, or among the measurement
+## error variances, of one latent variable within a condition and estimator,
+## rounded up
+grp <- with(summ[lam | theta, ],
+            paste(n, rel, estimator, grepl("=~", parameter),
+                  (as.integer(sub(".*y", "", parameter)) - 1) %/% 4))
+spread <- function(m, ...) {
+  s <- tapply(summ[[m]][lam | theta], grp, function(x) diff(range(x)))
+  num(ceiling(100 * max(s)) / 100, ...)
 }
 ```
 
@@ -1137,31 +1125,31 @@ perf_table <- function(measure, rel, digits, scale = 1) {
 
 All four estimators converged in every replication of every condition.
 Outlier screening removed `r scr$removed` of the 18,000 replications
-(`r sprintf("%.2f", scr$removed_pct)`%), concentrated at $n=100$ with
-reliability .6, where `r sprintf("%.1f", scr$removed_by_cond[1])`% of the
-replications were removed, flagged most often through JS
-(`r sprintf("%.1f", scr$flagged_100_06["JS"])`% of the replications in that
-condition). In every other condition fewer than 0.5% of the replications were
+(`r num(scr$removed_pct)`%), concentrated at $n=100$ with reliability .6,
+where `r num(scr$removed_by_cond[1], 1)`% of the replications were removed,
+flagged most often through JS (`r num(scr$flagged_100_06["JS"], 1)`% of the
+replications in that condition). In every other condition at most
+`r num(max(scr$removed_by_cond[-1]), 1)`% of the replications were
 removed.^[As a sensitivity check, all performance measures were recomputed
 without the outlier screening, retaining all 1,500 replications of every
-condition. The conclusions did not change, with one exception. The
-SE$^2$/VAR ratio of ML for $\lambda_{11}$ at $n=100$ with reliability .6
-fell from `r sprintf("%.2f", summ$rb_var[ml])` to
-`r sprintf("%.2f", summ_all$rb_var[ml])` without screening, just below the
-acceptable range. @apx-sensitivity reports, for each condition, the largest
-difference in each performance measure with and without screening, and the
-complete unscreened measures are available in the project repository.]
+condition. The conclusions did not change. @apx-sensitivity reports, for
+each condition, the largest difference in each performance measure with and
+without screening, and the complete unscreened measures are available in
+the project repository.]
 No inadmissible solutions occurred.
 
 ## Relative Bias
 
 JS, JSA, and ML were essentially unbiased, with absolute relative bias of at
-most `r pct(rb_other)`% for any parameter and condition. MIIV was also nearly
-unbiased except at reliability .6 and small samples. At $n=100$ its loadings
-were slightly underestimated, by `r pct(rb_iv_load[1])` to
-`r pct(rb_iv_load[2])`%, whereas its latent and disturbance variances were
-overestimated by `r pct(rb_iv_var[1])` to `r pct(rb_iv_var[2])`%. From
-$n=300$ onward, all estimators were within `r pct(rb_300)`% of the population
+most `r pct(max(abs(summ$rel_bias[!est("IV")])))`% for any parameter and
+condition. MIIV was also nearly unbiased except at reliability .6 and small
+samples. At $n=100$ its loadings
+were slightly underestimated, by
+`r rng(-summ$rel_bias[est("IV") & lam & c100], 1, 100)`%, whereas its latent
+and disturbance variances were overestimated by
+`r rng(summ$rel_bias[est("IV") & fvar & c100], 1, 100)`%. From $n=300$
+onward, all estimators were within
+`r pct(max(abs(summ$rel_bias[summ$n >= 300])))`% of the population
 values.
 
 ## Standard Error Performance
@@ -1173,15 +1161,16 @@ measurement error variances of the scaling indicators and one nonscaling
 indicator per latent variable, and @fig-sim-factorvar the variance of $\eta_1$ 
 and the two disturbance variances. Omitted loadings and measurement error 
 variances behave similarly to those shown for the same latent variable, with 
-SE$^2$/VAR ratios that differ 
-by less than 0.17 and coverage by .03 in every condition. Overall, standard
+SE$^2$/VAR ratios that differ
+by less than `r spread("rb_var")` and coverage by
+`r spread("coverage", lead0 = FALSE)` in every condition. Overall, standard
 error performance was acceptable. Across the
 `r format(nrow(summ), big.mark = ",")` combinations of
-`r length(unique(summ$parameter))` estimands, `r length(ns) * length(rels)` conditions, and
+`r length(unique(summ$parameter))` estimands, `r length(ns) * length(rels)` 
+conditions, and
 `r nlevels(summ$estimator)` estimators,
-`r sprintf("%.1f", 100 * mean(summ$coverage >=.925 & summ$coverage <= .975))`% 
-of coverage rates fell between .925 and .975
-and `r sprintf("%.1f", 100 * mean(summ$rb_var >= .90 & summ$rb_var <= 1.10))`%
+`r pct(mean(!cov_out))`% of coverage rates fell between .925 and .975
+and `r pct(mean(!rb_out))`%
 of SE$^2$/VAR ratios between 0.90 and 1.10. Coverage ranged from
 `r rng(summ$coverage, lead0 = FALSE)` and the ratios from
 `r rng(summ$rb_var)`. All `r sum(rb_out)` ratios outside the band exceeded
@@ -1192,41 +1181,51 @@ of SE$^2$/VAR ratios between 0.90 and 1.10. Coverage ranged from
 coverage rates occurred at $n=100$ or $n=200$. From $n=300$ onward, coverage
 ranged from `r rng(summ$coverage[summ$n >= 300], lead0 = FALSE)` and the
 ratios from `r rng(summ$rb_var[summ$n >= 300])`. Three departures are
-concentrated at $n=100$ and $n=200$, mainly at reliability .6.
+concentrated at $n=100$ and $n=200$.
 
 First, JS standard errors for $B_{31}$ and $B_{32}$ exceed the acceptable
 range at $n=100$ and reliability .6, with SE$^2$/VAR ratios of
-`r sprintf("%.2f", summ$rb_var[js31 & summ$n == 100])` and
-`r sprintf("%.2f", summ$rb_var[js32 & summ$n == 100])`. Coverage nonetheless
+`r num(summ$rb_var[est("JS") & b31])` and
+`r num(summ$rb_var[est("JS") & param("eta3~eta2") & c100])`. Coverage 
+nonetheless
 exceeds .975 only for $B_{31}$ at $n=100$. Its SD is also the largest,
-`r sprintf("%.2f", summ$sd[b31_100 & summ$estimator == "JS"])` versus
-`r paste(sprintf("%.2f", range(summ$sd[b31_100 & summ$estimator != "JS"])), collapse = "–")`.
+`r num(summ$sd[est("JS") & b31])` versus
+`r rng(summ$sd[!est("JS") & b31], sep = "–")`.
 Both slopes belong to the $\eta_3$ equation, the only equation with two
 latent predictors, and the departure is confined to the lowest reliability
-and the smallest sample size. JSA, which aggregates
+and largest at the smallest sample size. JSA, which aggregates
 indicators within each latent variable, shows only a slight excess for
 $B_{31}$ at $n=100$, with a ratio of
-`r sprintf("%.2f", summ$rb_var[b31_100 & summ$estimator == "JSA"])`.
+`r num(summ$rb_var[est("JSA") & b31])`.
 
 Second, MIIV loading intervals fall below the acceptable coverage range at
-reliability .6, with coverage of .88–.90 at $n=100$, compared with .93–.96 for
+reliability .6, with coverage of
+`r rng(summ$coverage[est("IV") & lam & c100], lead0 = FALSE, sep = "–")` at
+$n=100$, compared with
+`r rng(summ$coverage[!est("IV") & lam & c100], lead0 = FALSE, sep = "–")` for
 the other estimators, despite SE$^2$/VAR ratios of
-`r paste(sprintf("%.2f", range(rb_iv100$rb_var[grepl("=~", rb_iv100$parameter)])), collapse = "–")`
-and the smallest
-SD. This discrepancy reflects the downward loading bias reported above,
+`r rng(summ$rb_var[est("IV") & lam & c100], sep = "–")` and the smallest SD. 
+This discrepancy reflects the downward loading bias reported above,
 consistent with the known small-sample bias of IV estimators
 [@jin_etall_2021], which they found largest when all model-implied
 instruments are used, as here, and diminishes slowly as sample size
 increases.
 
 Third, at $n=100$ and reliability .6, MIIV overestimates the standard errors of the latent and
-disturbance variances, with ratios of 1.11–1.18, but its coverage rates of
-.96–.97 remain within the acceptable range. ML, in contrast, has ratios close
-to 1 but coverage rates of .91–.94 for the disturbance variances. JS and JSA
-fall between them. At reliability .8, the coverage rate for the disturbance
-variance of $\eta_2$ is about .92 for ML, JS, and JSA, just below the
-acceptable range. Measurement error variances show less contrast, with coverage rates
-from .91 to .96 across estimators and a common dip at $n=100$.
+disturbance variances, with ratios of
+`r rng(summ$rb_var[est("IV") & fvar & c100], sep = "–")`, but its coverage
+rates of `r rng(summ$coverage[est("IV") & fvar & c100], lead0 = FALSE, sep = "–")`
+remain within the acceptable range. ML, in contrast, has ratios close to 1
+but coverage rates of
+`r rng(summ$coverage[est("ML") & fvar & c100 & !param("eta1~~eta1")], lead0 = FALSE, sep = "–")`
+for the disturbance variances. JS and JSA
+fall between them. At reliability .8 and $n=100$, the coverage rate for the
+disturbance variance of $\eta_2$ ranges from
+`r rng(summ$coverage[!est("IV") & param("eta2~~eta2") & summ$n == 100 & summ$rel == 0.8], 3, lead0 = FALSE)`
+for ML, JS, and JSA, just below the acceptable range. Measurement error
+variances show less contrast, with coverage rates from
+`r rng(summ$coverage[theta], lead0 = FALSE)` across estimators and a common
+dip at $n=100$.
 
 ```{r}
 #| label: fig-sim-structural
@@ -1283,7 +1282,7 @@ performed comparably to those of MIIV and ML. Both estimators were
 essentially unbiased in all conditions, and their coverage rates and
 SE$^2$/VAR ratios were acceptable from $n=300$ onward for essentially
 every parameter.
-The one notable departure concerned JS at reliability .6 and $n=100$,
+The largest departure concerned JS at reliability .6 and $n=100$,
 where the standard errors of the slopes in the $\eta_3$ equation were too
 large. This departure was confined to the equation with two latent
 predictors. JSA,
@@ -1291,8 +1290,9 @@ which aggregates indicators within each latent variable, was much less
 affected. In small samples with low reliability, JSA is therefore
 preferable to JS. These results extend those of
 @burghgraeve_etall_2021, who found JS less efficient than JSA for latent
-regression estimation and JSA competitive with ML, consistent with the
-empirical standard deviations observed here. Their bootstrap standard
+regression estimation and JSA competitive with ML. The empirical standard
+deviations observed here show the same ranking, JS above JSA above ML. Their
+bootstrap standard
 errors for JS were too small in small samples, however, whereas our
 analytical standard errors were too large. Whether this difference reflects
 the standard error methods or differences in the simulation conditions
@@ -1301,8 +1301,8 @@ requires further investigation.
 The MIIV results provide the contrast and broadly align with earlier
 studies. @bollen_2019, summarizing @bollen_etall_2007, reports few
 differences between MIIV and ML under correct specification with normally
-distributed data. Our results agree in terms of bias and standard error
-accuracy from $n=300$ onward, although MIIV remained less precise than ML
+distributed data. Our results largely agree in terms of bias and standard
+error accuracy from $n=300$ onward, although MIIV remained less precise than ML
 for the latent regression slopes. @jin_etall_2021 found that low scaling
 indicator reliability can lead to biased MIIV estimates in small samples
 and, under that condition, to the least accurate standard errors for the
@@ -1383,12 +1383,17 @@ when they are retained.
 #| tbl-cap: "Sensitivity Check"
 #| apa-longtable: true
 #| apa-note: "Removed is the number of replications out of 1,500 removed by the outlier screening. The remaining columns give, for each performance measure, the largest absolute difference across the four estimators and all estimands between the reported value and the value with the removed replications retained. Conditions without removed replications are omitted."
-tab <- sens
-tab$rel <- sub("^0", "", format(tab$rel))
-kable(tab, booktabs = TRUE, format = "latex", digits = 3, longtable = TRUE,
-             row.names = FALSE, escape = FALSE,
-             col.names = c("$n$", "Reliability", "Removed", "Relative bias",
-                           "SD", "SE$^2$/VAR", "Coverage"))
+## sensitivity check: largest change per condition when outliers are retained
+cols <- c("rel_bias", "sd", "rb_var", "coverage")
+sens <- aggregate(abs(summ[cols] - summ_all[cols]), summ[c("n", "rel")], max)
+sens$removed <- as.vector(table(scr$removed_replications$cond)[paste(sens$n, sens$rel)])
+sens <- sens[!is.na(sens$removed), c("n", "rel", "removed", cols)]
+sens <- sens[order(sens$rel, sens$n), ]
+sens$rel <- sub("^0", "", format(sens$rel))
+kable(sens, booktabs = TRUE, format = "latex", digits = 3, longtable = TRUE,
+      row.names = FALSE, escape = FALSE,
+      col.names = c("$n$", "Reliability", "Removed", "Relative bias",
+                    "SD", "SE$^2$/VAR", "Coverage"))
 ```
 
 \newpage{}
@@ -1398,6 +1403,36 @@ kable(tab, booktabs = TRUE, format = "latex", digits = 3, longtable = TRUE,
 @tbl-rb-6 to @tbl-cov-8 report, for each performance measure and reliability,
 the values for every estimator, sample size, and estimand shown in the figures,
 with the MCSE in parentheses.
+
+```{r}
+#| label: complete-measures
+## complete performance measures: one measure at one reliability, with the
+## estimands of the figures by estimator as rows and the sample sizes as
+## columns, MCSE in parentheses
+pars_tab <- c(pars_coef, pars_load, pars_res, pars_fvar)
+lab_tab  <- c("$B_{21}$", "$B_{31}$", "$B_{32}$",
+              "$\\lambda_2$", "$\\lambda_6$", "$\\lambda_{10}$",
+              "$\\theta_1$", "$\\theta_2$", "$\\theta_5$", "$\\theta_6$",
+              "$\\theta_9$", "$\\theta_{10}$",
+              "$\\mathrm{Var}(\\eta_1)$", "$\\mathrm{Var}(\\zeta_2)$",
+              "$\\mathrm{Var}(\\zeta_3)$")
+perf_table <- function(measure, rel, digits, scale = 1) {
+  v <- summ[summ$parameter %in% pars_tab & summ$rel == rel, ]
+  v$parameter <- factor(v$parameter, levels = pars_tab)
+  cell <- sprintf(paste0("%.", digits, "f (%.", digits, "f)"),
+                  round(scale * v[[measure]], digits) + 0,   # + 0 avoids "-0.0"
+                  scale * v[[paste0(measure, "_mcse")]])
+  if (measure == "coverage") cell <- gsub("0\\.", ".", cell)
+  tab <- tapply(cell, v[c("estimator", "parameter", "n")], identity)
+  dim(tab) <- c(length(cell) / length(ns), length(ns))  # estimator within estimand
+  tab <- data.frame(c(rbind(lab_tab, "", "", "")), c("JS", "JSA", "MIIV", "ML"), tab)
+  asis_output(paste0("\\begingroup\\scriptsize\\renewcommand{\\arraystretch}{0.85}\n",
+    kable(tab, booktabs = TRUE, escape = FALSE, longtable = TRUE, format = "latex",
+          align = c("l", "l", rep("r", 6)), linesep = c("", "", "", "\\addlinespace[2pt]"),
+          col.names = c("Estimand", "Estimator", paste0("$n=", ns, "$"))),
+    "\n\\endgroup"))
+}
+```
 
 \newpage{}
 
