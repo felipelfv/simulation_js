@@ -828,7 +828,7 @@ $\widehat{\operatorname{SE}}(\widehat\theta_{T,j})=\sqrt{[\widehat{\mathbf V}_T]
 In this section we describe the design of the simulation study and the
 measures used to evaluate the standard errors.
 
-### Population Model and Estimands
+## Population Model and Estimands
 
 We study the model in @fig-model, with three latent variables and four
 indicators each. The latent variable model is
@@ -903,7 +903,7 @@ variances and disturbance variances.
 \end{tikzpicture}
 ```
 
-### Simulation Conditions and Estimation Approaches
+## Simulation Conditions and Estimation Approaches
 
 We employed a fully factorial design with two factors: sample size
 ($n\in\{100, 200, 300, 400, 500, 600\}$) and indicator reliability
@@ -923,7 +923,7 @@ variance, covariance, and intercept parameters in MIIV. For MIIV, each
 equation used all instruments implied by the model [@bollen_bauer_2004]. For
 ML, the standard errors were based on the expected Fisher information matrix.
 
-### Data Generation
+## Data Generation
 
 Data were generated from the population model with all stochastic
 components normal and mutually independent. The exogenous latent variable
@@ -942,7 +942,7 @@ The observed variables are therefore multivariate
 normal with the mean vector and covariance matrix implied by the
 population values. 
 
-### Convergence, Outliers, and Inadmissible Solutions
+## Convergence, Outliers, and Inadmissible Solutions
 
 Replications were screened in two steps, and a replication that failed
 either step for any estimator was removed for all four. A solution was
@@ -954,7 +954,7 @@ estimator, and estimand. Inadmissible
 solutions, with a nonpositive estimate of a measurement error, latent, or
 disturbance variance, were retained and counted.
 
-### Performance Measures
+## Performance Measures
 
 Performance was assessed with the measures implemented in the simhelpers
 package [@joshi_pustejovsky_2025], computed for every estimand. These
@@ -1001,7 +1001,8 @@ asis_output(paste0("\\begin{center}\n",
 ```{r}
 #| label: performance
 source("performance_calculation.R")
-summ$estimator <- factor(summ$estimator, levels = c("JS", "JSA", "IV", "ML"))
+summ$estimator <- factor(summ$estimator, levels = c("JS", "JSA", "IV", "ML"),
+                         labels = c("JS", "JSA", "MIIV", "ML"))
 ```
 
 ```{r}
@@ -1056,11 +1057,11 @@ plot_params <- function(pars, labels, breaks = ns) {
                labeller = labeller(parameter = label_parsed)) +
     scale_x_continuous(breaks = breaks) +
     scale_colour_manual(values = c(JS = okabe[["blue"]], JSA = okabe[["orange"]],
-                                   IV = okabe[["vermillion"]],
+                                   MIIV = okabe[["vermillion"]],
                                    ML = okabe[["bluishgreen"]])) +
-    scale_shape_manual(values = c(JS = 16, JSA = 18, IV = 15, ML = 17)) +
+    scale_shape_manual(values = c(JS = 16, JSA = 18, MIIV = 15, ML = 17)) +
     scale_linetype_manual(values = c(JS = "solid", JSA = "dashed",
-                                     IV = "longdash", ML = "dotdash")) +
+                                     MIIV = "longdash", ML = "dotdash")) +
     labs(x = expression(italic(n)), y = NULL, colour = "Estimator",
          shape = "Estimator", linetype = "Estimator") +
     theme_minimal(base_size = 10) +
@@ -1098,9 +1099,9 @@ pct <- function(x) num(x, 1, 100)
 est   <- function(e) summ$estimator == e
 param <- function(p) summ$parameter == p
 c100  <- summ$n == 100 & summ$rel == 0.6 # smallest n, lowest reliability
-lam   <- grepl("=~", summ$parameter)   
-theta <- grepl("^y", summ$parameter)    
-fvar  <- grepl("^eta[0-9]~~", summ$parameter)   
+lam   <- grepl("=~", summ$parameter)
+theta <- grepl("^y", summ$parameter)
+fvar  <- grepl("^eta[0-9]~~", summ$parameter)
 b31   <- param("eta3~eta1") & c100
 
 ## values outside the acceptable ranges
@@ -1141,13 +1142,13 @@ No inadmissible solutions occurred.
 ## Relative Bias
 
 JS, JSA, and ML were essentially unbiased, with absolute relative bias of at
-most `r pct(max(abs(summ$rel_bias[!est("IV")])))`% for any parameter and
+most `r pct(max(abs(summ$rel_bias[!est("MIIV")])))`% for any parameter and
 condition. MIIV was also nearly unbiased except at reliability .6 and small
 samples. At $n=100$ its loadings
 were slightly underestimated, by
-`r rng(-summ$rel_bias[est("IV") & lam & c100], 1, 100)`%, whereas its latent
+`r rng(-summ$rel_bias[est("MIIV") & lam & c100], 1, 100)`%, whereas its latent
 and disturbance variances were overestimated by
-`r rng(summ$rel_bias[est("IV") & fvar & c100], 1, 100)`%. From $n=300$
+`r rng(summ$rel_bias[est("MIIV") & fvar & c100], 1, 100)`%. From $n=300$
 onward, all estimators were within
 `r pct(max(abs(summ$rel_bias[summ$n >= 300])))`% of the population
 values.
@@ -1173,8 +1174,8 @@ conditions, and
 and `r pct(mean(!rb_out))`%
 of SE$^2$/VAR ratios between 0.90 and 1.10. Coverage ranged from
 `r rng(summ$coverage, lead0 = FALSE)` and the ratios from
-`r rng(summ$rb_var)`. All `r sum(rb_out)` ratios outside the band exceeded
-1.10, and of the `r sum(cov_out)` coverage rates outside the band only
+`r rng(summ$rb_var)`. All `r sum(rb_out)` ratios outside the acceptable
+range exceeded 1.10, and of the `r sum(cov_out)` coverage rates outside it only
 `r sum(summ$coverage > .975)` exceeded .975, the remaining
 `r sum(summ$coverage < .925)` falling below .925. Of these,
 `r sum(rb_out & summ$n <= 200)` ratios and `r sum(cov_out & summ$n <= 200)`
@@ -1200,11 +1201,11 @@ $B_{31}$ at $n=100$, with a ratio of
 
 Second, MIIV loading intervals fall below the acceptable coverage range at
 reliability .6, with coverage of
-`r rng(summ$coverage[est("IV") & lam & c100], lead0 = FALSE, sep = "–")` at
+`r rng(summ$coverage[est("MIIV") & lam & c100], lead0 = FALSE, sep = "–")` at
 $n=100$, compared with
-`r rng(summ$coverage[!est("IV") & lam & c100], lead0 = FALSE, sep = "–")` for
+`r rng(summ$coverage[!est("MIIV") & lam & c100], lead0 = FALSE, sep = "–")` for
 the other estimators, despite SE$^2$/VAR ratios of
-`r rng(summ$rb_var[est("IV") & lam & c100], sep = "–")` and the smallest SD. 
+`r rng(summ$rb_var[est("MIIV") & lam & c100], sep = "–")` and the smallest SD. 
 This discrepancy reflects the downward loading bias reported above,
 consistent with the known small-sample bias of IV estimators
 [@jin_etall_2021], which they found largest when all model-implied
@@ -1213,15 +1214,15 @@ increases.
 
 Third, at $n=100$ and reliability .6, MIIV overestimates the standard errors of the latent and
 disturbance variances, with ratios of
-`r rng(summ$rb_var[est("IV") & fvar & c100], sep = "–")`, but its coverage
-rates of `r rng(summ$coverage[est("IV") & fvar & c100], lead0 = FALSE, sep = "–")`
+`r rng(summ$rb_var[est("MIIV") & fvar & c100], sep = "–")`, but its coverage
+rates of `r rng(summ$coverage[est("MIIV") & fvar & c100], lead0 = FALSE, sep = "–")`
 remain within the acceptable range. ML, in contrast, has ratios close to 1
 but coverage rates of
 `r rng(summ$coverage[est("ML") & fvar & c100 & !param("eta1~~eta1")], lead0 = FALSE, sep = "–")`
 for the disturbance variances. JS and JSA
 fall between them. At reliability .8 and $n=100$, the coverage rate for the
 disturbance variance of $\eta_2$ ranges from
-`r rng(summ$coverage[!est("IV") & param("eta2~~eta2") & summ$n == 100 & summ$rel == 0.8], 3, lead0 = FALSE)`
+`r rng(summ$coverage[!est("MIIV") & param("eta2~~eta2") & summ$n == 100 & summ$rel == 0.8], 3, lead0 = FALSE)`
 for ML, JS, and JSA, just below the acceptable range. Measurement error
 variances show less contrast, with coverage rates from
 `r rng(summ$coverage[theta], lead0 = FALSE)` across estimators and a common
@@ -1230,7 +1231,7 @@ dip at $n=100$.
 ```{r}
 #| label: fig-sim-structural
 #| fig-cap: "Performance of the Standard Errors of the Latent Regression Slopes"
-#| apa-note: "NoNote *Note.* JS = scaling James–Stein, JSA = aggregated James–Stein, IV = MIIV, ML = maximum likelihood. Dotted lines mark the reference values 1 and .95, and shaded bands the acceptable ranges of 0.90 to 1.10 and .925 to .975. Error bars represent Monte Carlo standard errors."
+#| apa-note: "NoNote *Note.* JS = scaling James–Stein, JSA = aggregated James–Stein, MIIV = model-implied instrumental variable, ML = maximum likelihood. Dotted lines mark the reference values 1 and .95, and shaded bands the acceptable ranges of 0.90 to 1.10 and .925 to .975. Error bars represent Monte Carlo standard errors."
 #| fig-width: 6.5
 #| fig-height: 8.5
 #| out-width: "100%"
@@ -1240,7 +1241,7 @@ plot_params(pars_coef, lab_coef)
 ```{r}
 #| label: fig-sim-loadings
 #| fig-cap: "Performance of the Standard Errors of One Factor Loading per Latent Variable"
-#| apa-note: "NoNote *Note.* JS = scaling James–Stein, JSA = aggregated James–Stein, IV = MIIV, ML = maximum likelihood. Dotted lines mark the reference values 1 and .95, and shaded bands the acceptable ranges of 0.90 to 1.10 and .925 to .975. Error bars represent Monte Carlo standard errors."
+#| apa-note: "NoNote *Note.* JS = scaling James–Stein, JSA = aggregated James–Stein, MIIV = model-implied instrumental variable, ML = maximum likelihood. Dotted lines mark the reference values 1 and .95, and shaded bands the acceptable ranges of 0.90 to 1.10 and .925 to .975. Error bars represent Monte Carlo standard errors."
 #| fig-width: 6.5
 #| fig-height: 8.5
 #| out-width: "100%"
@@ -1250,7 +1251,7 @@ plot_params(pars_load, lab_load)
 ```{r}
 #| label: fig-sim-residual
 #| fig-cap: "Performance of the Standard Errors of the Measurement Error Variances of the Scaling Indicator and One Nonscaling Indicator per Latent Variable"
-#| apa-note: "NoNote *Note.* JS = scaling James–Stein, JSA = aggregated James–Stein, IV = MIIV, ML = maximum likelihood. Dotted lines mark the reference values 1 and .95, and shaded bands the acceptable ranges of 0.90 to 1.10 and .925 to .975. Error bars represent Monte Carlo standard errors."
+#| apa-note: "NoNote *Note.* JS = scaling James–Stein, JSA = aggregated James–Stein, MIIV = model-implied instrumental variable, ML = maximum likelihood. Dotted lines mark the reference values 1 and .95, and shaded bands the acceptable ranges of 0.90 to 1.10 and .925 to .975. Error bars represent Monte Carlo standard errors."
 #| fig-width: 6.5
 #| fig-height: 8.5
 #| out-width: "100%"
@@ -1260,7 +1261,7 @@ plot_params(pars_res, lab_res, breaks = c(100, 300, 500))
 ```{r}
 #| label: fig-sim-factorvar
 #| fig-cap: "Performance of the Standard Errors of the Latent and Disturbance Variances"
-#| apa-note: "NoNote *Note.* JS = scaling James–Stein, JSA = aggregated James–Stein, IV = MIIV, ML = maximum likelihood. Dotted lines mark the reference values 1 and .95, and shaded bands the acceptable ranges of 0.90 to 1.10 and .925 to .975. Error bars represent Monte Carlo standard errors."
+#| apa-note: "NoNote *Note.* JS = scaling James–Stein, JSA = aggregated James–Stein, MIIV = model-implied instrumental variable, ML = maximum likelihood. Dotted lines mark the reference values 1 and .95, and shaded bands the acceptable ranges of 0.90 to 1.10 and .925 to .975. Error bars represent Monte Carlo standard errors."
 #| fig-width: 6.5
 #| fig-height: 8.5
 #| out-width: "100%"
@@ -1380,7 +1381,7 @@ when they are retained.
 
 ```{r}
 #| label: tbl-sensitivity
-#| tbl-cap: "Sensitivity Check"
+#| tbl-cap: "Sensitivity"
 #| apa-longtable: true
 #| apa-note: "Removed is the number of replications out of 1,500 removed by the outlier screening. The remaining columns give, for each performance measure, the largest absolute difference across the four estimators and all estimands between the reported value and the value with the removed replications retained. Conditions without removed replications are omitted."
 ## sensitivity check: largest change per condition when outliers are retained
@@ -1425,7 +1426,7 @@ perf_table <- function(measure, rel, digits, scale = 1) {
   if (measure == "coverage") cell <- gsub("0\\.", ".", cell)
   tab <- tapply(cell, v[c("estimator", "parameter", "n")], identity)
   dim(tab) <- c(length(cell) / length(ns), length(ns))  # estimator within estimand
-  tab <- data.frame(c(rbind(lab_tab, "", "", "")), c("JS", "JSA", "MIIV", "ML"), tab)
+  tab <- data.frame(c(rbind(lab_tab, "", "", "")), levels(summ$estimator), tab)
   asis_output(paste0("\\begingroup\\scriptsize\\renewcommand{\\arraystretch}{0.85}\n",
     kable(tab, booktabs = TRUE, escape = FALSE, longtable = TRUE, format = "latex",
           align = c("l", "l", rep("r", 6)), linesep = c("", "", "", "\\addlinespace[2pt]"),
